@@ -12,7 +12,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'seller.sellerProfile', 'primaryImage'])->active();
+        $query = Product::with(['category', 'seller.sellerProfile', 'primaryImage', 'variants', 'skus'])->active();
 
         // Apply filters
         if ($request->has('category_id')) {
@@ -45,7 +45,7 @@ class ProductController extends Controller
 
     public function show($slug)
     {
-        $product = Product::with(['category', 'seller.sellerProfile', 'images', 'reviews.user'])
+        $product = Product::with(['category', 'seller.sellerProfile', 'images', 'reviews.user', 'variants', 'skus'])
             ->where('slug', $slug)
             ->firstOrFail();
 

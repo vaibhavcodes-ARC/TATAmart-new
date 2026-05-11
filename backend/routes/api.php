@@ -33,7 +33,23 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
-    // 3. Seller-Only Routes
+    // 3. Shared E-commerce Flow
+    Route::get('/cart', [App\Http\Controllers\Api\CartController::class, 'index']);
+    Route::post('/cart/items', [App\Http\Controllers\Api\CartController::class, 'store']);
+    Route::put('/cart/{itemId}', [App\Http\Controllers\Api\CartController::class, 'update']);
+    Route::delete('/cart/{itemId}', [App\Http\Controllers\Api\CartController::class, 'destroy']);
+    
+    Route::post('/orders', [App\Http\Controllers\Api\OrderController::class, 'store']);
+
+    // 4. Real-time Conversations
+    Route::get('/chat/conversations', [App\Http\Controllers\Api\ChatController::class, 'index']);
+    Route::get('/chat/messages/{conversationId}', [App\Http\Controllers\Api\ChatController::class, 'show']);
+    Route::post('/chat/messages/{conversationId}', [App\Http\Controllers\Api\ChatController::class, 'sendMessage']);
+
+    // 5. Verification & Public Trust
+    Route::post('/products/reviews', [App\Http\Controllers\Api\ReviewController::class, 'store']);
+
+    // 4. Seller-Only Routes
     Route::group(['middleware' => 'role:seller'], function () {
         Route::post('/seller/products', [ProductController::class, 'store']);
         Route::get('/seller/my-products', [ProductController::class, 'myProducts']);
@@ -43,7 +59,7 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::post('/seller/rfqs/{id}/respond', [RfqController::class, 'respond']);
     });
 
-    // 4. Buyer-Only Routes
+    // 5. Buyer-Only Routes
     Route::group(['middleware' => 'role:buyer'], function () {
         Route::get('/buyer/dashboard', [DashboardController::class, 'buyerStats']);
         

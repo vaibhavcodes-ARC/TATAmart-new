@@ -62,4 +62,20 @@ class Product extends Model
     {
         return $query->where('is_active', true);
     }
+
+    /**
+     * Retrieve deep dimension configurations.
+     */
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    /**
+     * Retrieve distinct stock keeping units associated.
+     */
+    public function skus()
+    {
+        return $this->hasMany(ProductSku::class);
+    }
 }

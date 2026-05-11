@@ -42,7 +42,7 @@ services:
     image: mariadb:10.11
     restart: always
     ports:
-      - "3306:3306"
+      - "3308:3306"
     environment:
       MARIADB_ROOT_PASSWORD: root_password
       MARIADB_DATABASE: tatamart_db
@@ -56,7 +56,7 @@ services:
   phpmyadmin:
     image: phpmyadmin:latest
     ports:
-      - "8080:80"
+      - "8081:80"
     environment:
       PMA_HOST: mariadb
       MYSQL_ROOT_PASSWORD: root_password
