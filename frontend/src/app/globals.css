@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Space Grotesk', 'Satoshi', sans-serif;
+
+  --color-background: #0a0a0a;
+  --color-foreground: #f5f5f5;
+  
+  --color-tata-red: #E31837;
+  --color-tata-red-dark: #A61229;
+  --color-tata-blue: #1a73e8;
+
+  --color-muted: #666666;
+  --color-muted-foreground: #a3a3a3;
+
+  --color-card: #141414;
+  --color-card-border: #262626;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  --shadow-glow: 0 0 20px rgba(227, 24, 55, 0.3);
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: rgba(20, 20, 20, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  .glass-card {
+    background: linear-gradient(145deg, rgba(30,30,30,0.6) 0%, rgba(15,15,15,0.6) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.3s ease;
+  }
+
+  .glass-card:hover {
+    border-color: var(--color-tata-red);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 15px rgba(227, 24, 55, 0.4);
+  }
+
+  .bg-grid-pattern {
+    background-image: radial-gradient(#262626 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+}
