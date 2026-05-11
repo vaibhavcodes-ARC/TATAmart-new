@@ -2,14 +2,43 @@
 
 Welcome to the official Enterprise iteration of TATAmart. This codebase contains a complete Next.js TypeScript Frontend and a scalable Laravel 11 RESTful Backend supporting advanced marketplace transactional flow.
 
-## 🚀 Quick Start Guide
+## 🚀 Quick Start Guide (Recommended: Docker)
 
-Launch the full unified stack (Frontend, Backend, and Database) simultaneously using Docker Compose:
+Launch the full unified ecosystem (Frontend, Backend, and Databases) with a single command. Ensure Docker Desktop is running, then execute:
 
 ```bash
-# Ensure Docker daemon is active
 docker-compose up -d --build
 ```
+Once completed, access frontend at `localhost:3000` and backend at `localhost:8000`.
+
+---
+
+## 💻 Native Setup Guide (Alternative: Without Docker)
+
+If you prefer running natively on Windows/macOS using XAMPP or local PHP:
+
+### 1. Backend Deployment
+```bash
+cd backend
+cp .env.example .env
+composer install
+php artisan key:generate
+```
+*   Create a database named `tatamart_db` in your local MySQL/XAMPP.
+*   Update `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` inside `.env` to match your local setup.
+*   Then run:
+```bash
+php artisan migrate --seed
+php artisan serve
+```
+
+### 2. Frontend Deployment
+```bash
+cd frontend
+npm install
+npm run dev
+```
+*   Open `src/utils/api.ts` and verify `API_BASE_URL` matches your active backend address.
 
 ## 🌐 Operational Access Points
 
