@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { api } from '../../../utils/api';
+import { api, getApiErrorMessage } from '../../../utils/api';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, ShoppingBag, ArrowRight, UserCheck } from 'lucide-react';
@@ -29,9 +29,8 @@ export default function Register() {
       const { token, user } = response.data;
       loginStore(token, user);
       router.push('/');
-    } catch (err: any) {
-      console.error(err);
-      setError(err.response?.data?.message || 'Registration failed. Try again.');
+    } catch (err: unknown) {
+      setError(getApiErrorMessage(err, 'Registration failed. Try again.'));
     } finally {
       setLoading(false);
     }
@@ -65,7 +64,7 @@ export default function Register() {
         {/* Auth Glass Card */}
         <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8 shadow-2xl backdrop-blur-xl">
           <h2 className="font-inter text-2xl font-bold tracking-tight text-white mb-2">Create Account</h2>
-          <p className="text-sm font-semibold text-zinc-400 mb-6">Join India's premium industrial network</p>
+          <p className="text-sm font-semibold text-zinc-400 mb-6">Join India&apos;s premium industrial network</p>
 
           {error && (
             <div className="mb-4 rounded-xl border border-red-500/20 bg-red-500/10 p-3.5 text-xs font-bold text-red-400">

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 interface User {
-  id: string;
+  id: string | number;
   name: string;
   email: string;
   role: 'BUYER' | 'SELLER' | 'ADMIN';
@@ -20,17 +20,34 @@ export const useAuthStore = create<AuthState>((set) => {
   const isClient = typeof window !== 'undefined';
   const initialToken = isClient ? localStorage.getItem('tatamart_token') : null;
   const initialUser = isClient ? localStorage.getItem('tatamart_user') : null;
+  const parsedUser = (() => {
+    if (!initialUser) return null;
+    try {
+      const user = JSON.parse(initialUser) as User;
+      return {
+        ...user,
+        role: user.role.toUpperCase() as User['role'],
+      };
+    } catch {
+      localStorage.removeItem('tatamart_user');
+      return null;
+    }
+  })();
 
   return {
     token: initialToken,
-    user: initialUser ? JSON.parse(initialUser) : null,
-    isAuthenticated: !!initialToken,
+    user: parsedUser,
+    isAuthenticated: !!initialToken && !!parsedUser,
     login: (token, user) => {
+      const normalizedUser = {
+        ...user,
+        role: user.role.toUpperCase() as User['role'],
+      };
       if (isClient) {
         localStorage.setItem('tatamart_token', token);
-        localStorage.setItem('tatamart_user', JSON.stringify(user));
+        localStorage.setItem('tatamart_user', JSON.stringify(normalizedUser));
       }
-      set({ token, user, isAuthenticated: true });
+      set({ token, user: normalizedUser, isAuthenticated: true });
     },
     logout: () => {
       if (isClient) {

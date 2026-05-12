@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '../../components/Header';
 import { api } from '../../utils/api';
-import { Search, SlidersHorizontal, ShoppingBag, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { SlidersHorizontal, ShoppingBag, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Product {
@@ -16,6 +16,25 @@ interface Product {
   images: string[];
   categoryId: string;
   sellerId: string;
+}
+
+interface BackendProduct {
+  id: string | number;
+  name?: string;
+  title?: string;
+  short_description?: string;
+  description?: string;
+  price_min?: string | number;
+  price?: string | number;
+  min_order_quantity?: string | number;
+  moq?: string | number;
+  primary_image?: { image_path?: string };
+  primaryImage?: { image_path?: string };
+  images?: string[];
+  category?: { slug?: string; name?: string };
+  category_id?: string | number;
+  seller_id?: string | number;
+  sellerId?: string | number;
 }
 
 function ProductListContent() {
@@ -36,40 +55,45 @@ function ProductListContent() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      console.log('ATTEMPTING FETCH FROM /api/products...');
-      // Direct reliable fetch from Laravel API
-      const dbResponse = await api.get('/products');
-      console.log('RAW API RESPONSE RECEIVED:', dbResponse.data);
+      const dbResponse = await api.get('/products', {
+        params: {
+          search: q || undefined,
+          min_price: minPrice || undefined,
+          max_price: maxPrice || undefined,
+        },
+      });
       
       // Drill down precisely to items array
       const rawData = dbResponse.data?.data?.data || dbResponse.data?.data || [];
-      console.log('PARSED DATA ARRAY FOR DISPLAY:', rawData);
 
       // Map Backend keys to React Frontend model
-      const mapped = rawData.map((p: any) => ({
-        id: p.id,
-        title: p.name || p.title,
-        description: p.short_description || p.description,
-        price: Number(p.price_min || p.price || 0),
-        moq: Number(p.min_order_quantity || p.moq || 1),
-        images: (p.primary_image || p.primaryImage) ? [(p.primary_image || p.primaryImage).image_path] : (p.images || []),
-        categoryId: p.category?.slug || p.category_id,
-        sellerId: p.seller_id || p.sellerId
-      }));
+      const mapped = rawData.map((p: BackendProduct) => {
+        const primaryImage = p.primary_image || p.primaryImage;
+
+        return {
+          id: String(p.id),
+          title: p.name || p.title || 'Untitled product',
+          description: p.short_description || p.description || '',
+          price: Number(p.price_min || p.price || 0),
+          moq: Number(p.min_order_quantity || p.moq || 1),
+          images: primaryImage?.image_path ? [primaryImage.image_path] : (p.images || []),
+          categoryId: String(p.category?.slug || p.category_id || ''),
+          sellerId: String(p.seller_id || p.sellerId || ''),
+        };
+      });
 
       let filtered = mapped;
       // Safe Filter Application
       if (niche && niche !== 'ALL') {
-        filtered = filtered.filter((p: any) => String(p.categoryId) === niche);
+        filtered = filtered.filter((p: Product) => String(p.categoryId) === niche);
       }
       if (q) {
         filtered = filtered.filter(
-          (p: any) =>
+          (p: Product) =>
             String(p.title || '').toLowerCase().includes(q.toLowerCase()) ||
             String(p.description || '').toLowerCase().includes(q.toLowerCase())
         );
       }
-      console.log('FINAL FILTERED LIST FOR STATE SET:', filtered);
       setProducts(filtered);
     } catch (error) {
       console.error('CRITICAL FETCH ERROR DETECTED:', error);

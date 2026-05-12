@@ -20,6 +20,25 @@ interface CartItem {
   };
 }
 
+interface BackendCartItem {
+  id: string | number;
+  productId?: string | number;
+  product_id?: string | number;
+  quantity: number;
+  product: {
+    id: string | number;
+    title?: string;
+    name?: string;
+    price?: number | string;
+    price_min?: number | string;
+    moq?: number | string;
+    min_order_quantity?: number | string;
+    images?: string[];
+    primary_image?: { image_path?: string };
+    primaryImage?: { image_path?: string };
+  };
+}
+
 export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +49,19 @@ export default function CartPage() {
   const fetchCart = async () => {
     try {
       const response = await api.get('/cart');
-      setItems(response.data.cart.items || []);
+      const cartItems = response.data.cart?.items || [];
+      setItems(cartItems.map((item: BackendCartItem) => ({
+        id: String(item.id),
+        productId: String(item.productId || item.product_id || item.product.id),
+        quantity: item.quantity,
+        product: {
+          id: String(item.product.id),
+          title: item.product.title || item.product.name || 'Untitled product',
+          price: Number(item.product.price || item.product.price_min || 0),
+          moq: Number(item.product.moq || item.product.min_order_quantity || 1),
+          images: item.product.images || (item.product.primary_image?.image_path ? [item.product.primary_image.image_path] : []),
+        },
+      })));
     } catch (error) {
       console.error('Error fetching cart:', error);
     } finally {

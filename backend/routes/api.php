@@ -15,8 +15,10 @@ use App\Http\Controllers\Api\DashboardController;
 */
 
 // 1. Public Endpoints
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
 // Product browsing
 Route::get('/products', [ProductController::class, 'index']);
@@ -29,9 +31,12 @@ Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
 // 2. Protected Common Routes (JWT Verified)
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/refresh', [AuthController::class, 'refresh']);
+    
+    Route::group(['prefix' => 'auth'], function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/me', [AuthController::class, 'me']);
+        Route::post('/refresh', [AuthController::class, 'refresh']);
+    });
 
     // 3. Shared E-commerce Flow
     Route::get('/cart', [App\Http\Controllers\Api\CartController::class, 'index']);
@@ -48,15 +53,23 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     // 5. Verification & Public Trust
     Route::post('/products/reviews', [App\Http\Controllers\Api\ReviewController::class, 'store']);
+    Route::post('/products/inquire', [ProductController::class, 'inquire']);
+    Route::get('/orders', [App\Http\Controllers\Api\OrderController::class, 'index']);
 
     // 4. Seller-Only Routes
     Route::group(['middleware' => 'role:seller'], function () {
+        Route::get('/analytics/seller', [DashboardController::class, 'sellerAnalytics']);
         Route::post('/seller/products', [ProductController::class, 'store']);
+        Route::post('/products', [ProductController::class, 'store']);
         Route::get('/seller/my-products', [ProductController::class, 'myProducts']);
+        Route::put('/products/{id}', [ProductController::class, 'update']);
+        Route::delete('/products/{id}', [ProductController::class, 'destroy']);
         Route::get('/seller/dashboard', [DashboardController::class, 'sellerStats']);
         
         Route::get('/seller/rfqs', [RfqController::class, 'marketplace']); // Browse open RFQs
+        Route::get('/rfqs/leads', [RfqController::class, 'marketplace']);
         Route::post('/seller/rfqs/{id}/respond', [RfqController::class, 'respond']);
+        Route::post('/rfqs/respond', [RfqController::class, 'respondFromBody']);
     });
 
     // 5. Buyer-Only Routes
@@ -64,6 +77,17 @@ Route::group(['middleware' => 'auth:api'], function () {
         Route::get('/buyer/dashboard', [DashboardController::class, 'buyerStats']);
         
         Route::get('/buyer/rfqs', [RfqController::class, 'index']); // Their own list
+        Route::get('/rfqs/buyer', [RfqController::class, 'index']);
         Route::post('/buyer/rfqs', [RfqController::class, 'store']); // Create new RFQ
+        Route::post('/rfqs', [RfqController::class, 'store']);
+        Route::post('/rfqs/responses/{id}/select', [RfqController::class, 'selectResponse']);
+    });
+
+    Route::group(['middleware' => 'role:admin'], function () {
+        Route::get('/admin/users', [DashboardController::class, 'adminUsers']);
+        Route::get('/admin/products', [DashboardController::class, 'adminProducts']);
+        Route::get('/admin/stats', [DashboardController::class, 'adminStats']);
+        Route::put('/admin/users/{id}/verify', [DashboardController::class, 'toggleUserVerification']);
+        Route::delete('/admin/products/{id}', [ProductController::class, 'destroy']);
     });
 });

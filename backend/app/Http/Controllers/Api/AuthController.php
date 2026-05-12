@@ -11,11 +11,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use Throwable;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
+        // Normalize input
+        $request->merge([
+            'role' => strtolower($request->role ?? ''),
+        ]);
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -25,7 +31,11 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
         }
 
         $user = User::create([
@@ -48,12 +58,20 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = JWTAuth::fromUser($user);
+        try {
+            $token = JWTAuth::fromUser($user);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Authentication service is not configured. Please set JWT_SECRET.',
+            ], 500);
+        }
 
         return response()->json([
             'status' => 'success',
             'message' => 'User created successfully',
             'user' => $user,
+            'token' => $token,
             'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',
@@ -70,7 +88,14 @@ class AuthController extends Controller
         
         $credentials = $request->only('email', 'password');
 
-        $token = Auth::attempt($credentials);
+        try {
+            $token = Auth::attempt($credentials);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Authentication service is unavailable. Please verify JWT_SECRET and database connectivity.',
+            ], 500);
+        }
         if (!$token) {
             return response()->json([
                 'status' => 'error',
@@ -79,9 +104,17 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        if (! $user->is_active) {
+            Auth::logout();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'This account is disabled. Please contact support.',
+            ], 403);
+        }
         return response()->json([
             'status' => 'success',
             'user' => $user,
+            'token' => $token,
             'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',

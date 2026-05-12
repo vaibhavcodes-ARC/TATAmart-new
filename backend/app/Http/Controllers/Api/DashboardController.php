@@ -7,6 +7,8 @@ use App\Models\Product;
 use App\Models\Rfq;
 use App\Models\RfqResponse;
 use App\Models\Inquiry;
+use App\Models\Order;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -65,6 +67,104 @@ class DashboardController extends Controller
                 'recent_orders' => $recentOrders,
                 'inquiries_sent' => Inquiry::where('buyer_id', $userId)->count(),
             ]
+        ]);
+    }
+
+    public function sellerAnalytics()
+    {
+        $userId = Auth::id();
+        $rfqs = Rfq::whereHas('responses', fn ($query) => $query->where('seller_id', $userId));
+        $totalLeads = Rfq::where('status', 'open')->count();
+        $quotesSent = RfqResponse::where('seller_id', $userId)->count();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'totalLeads' => $totalLeads,
+                'responseRate' => $totalLeads > 0 ? round(($quotesSent / $totalLeads) * 100) : 0,
+                'statusCounts' => [
+                    'PENDING' => Rfq::where('status', 'open')->count(),
+                    'REPLIED' => (clone $rfqs)->count(),
+                    'CLOSED' => Rfq::where('status', 'closed')->count(),
+                ],
+                'topProducts' => Product::where('seller_id', $userId)
+                    ->withCount('images')
+                    ->latest()
+                    ->take(5)
+                    ->get()
+                    ->map(fn ($product) => [
+                        'id' => (string) $product->id,
+                        'title' => $product->name,
+                        'inquiries_count' => Inquiry::where('product_id', $product->id)->count(),
+                    ]),
+                'monthlyLeads' => [],
+            ],
+        ]);
+    }
+
+    public function adminStats()
+    {
+        return response()->json([
+            'totalUsers' => User::count(),
+            'totalProducts' => Product::count(),
+            'totalInquiries' => Inquiry::count(),
+            'totalOrders' => Order::count(),
+        ]);
+    }
+
+    public function adminUsers()
+    {
+        $users = User::with(['sellerProfile', 'buyerProfile'])->latest()->get()->map(function ($user) {
+            $profile = $user->sellerProfile ?: $user->buyerProfile;
+
+            return [
+                'id' => (string) $user->id,
+                'email' => $user->email,
+                'name' => $user->name,
+                'role' => strtoupper($user->role),
+                'createdAt' => optional($user->created_at)->toIso8601String(),
+                'profile' => $profile ? [
+                    'companyName' => $profile->company_name ?? '',
+                    'gstNumber' => $profile->gst_number ?? '',
+                    'city' => $profile->city ?? '',
+                    'isVerified' => (bool) ($profile->is_verified ?? false),
+                ] : null,
+            ];
+        });
+
+        return response()->json($users);
+    }
+
+    public function adminProducts()
+    {
+        $products = Product::with(['category', 'seller'])->latest()->get()->map(fn ($product) => [
+            'id' => (string) $product->id,
+            'title' => $product->name,
+            'price' => (float) $product->price_min,
+            'categoryId' => $product->category?->name ?? '',
+            'seller' => [
+                'name' => $product->seller?->name ?? 'Unknown',
+                'email' => $product->seller?->email ?? '',
+            ],
+        ]);
+
+        return response()->json($products);
+    }
+
+    public function toggleUserVerification(Request $request, int $id)
+    {
+        $user = User::with('sellerProfile')->findOrFail($id);
+
+        if (! $user->sellerProfile) {
+            return response()->json(['message' => 'Seller profile not found'], 404);
+        }
+
+        $request->validate(['isVerified' => 'required|boolean']);
+        $user->sellerProfile->update(['is_verified' => $request->boolean('isVerified')]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Verification status updated',
         ]);
     }
 }

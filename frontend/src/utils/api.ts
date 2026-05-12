@@ -4,8 +4,10 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/a
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
 });
 
@@ -24,3 +26,29 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (typeof window !== 'undefined' && error.response?.status === 401) {
+      localStorage.removeItem('tatamart_token');
+      localStorage.removeItem('tatamart_user');
+    }
+
+    if (error.code === 'ECONNABORTED') {
+      error.message = 'Request timed out. Please check that the backend API is running.';
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export const getApiErrorMessage = (error: unknown, fallback: string) => {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as { message?: string; errors?: Record<string, string[]> } | undefined;
+    const firstValidationError = data?.errors ? Object.values(data.errors)[0]?.[0] : undefined;
+    return firstValidationError || data?.message || error.message || fallback;
+  }
+
+  return fallback;
+};

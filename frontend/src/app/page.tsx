@@ -72,7 +72,7 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="font-hero text-4xl sm:text-6xl font-black tracking-tight bg-gradient-to-r from-zinc-950 via-zinc-800 to-zinc-950 bg-clip-text text-transparent dark:from-white dark:via-zinc-200 dark:to-white leading-tight sm:leading-none"
           >
-            India's Premium B2B<br />Industrial Marketplace
+            India&apos;s Premium B2B<br />Industrial Marketplace
           </motion.h1>
 
           <motion.p

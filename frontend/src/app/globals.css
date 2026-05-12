@@ -3,6 +3,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-hero: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-inter: "Inter", system-ui, sans-serif;
+  --font-sans: "DM Sans", "Inter", system-ui, sans-serif;
+  --font-monoenterprise: "IBM Plex Sans", "Inter", system-ui, sans-serif;
+  --font-footer: "Manrope", "Inter", system-ui, sans-serif;
 }
 
 @theme inline {

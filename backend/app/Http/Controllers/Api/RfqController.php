@@ -13,19 +13,38 @@ class RfqController extends Controller
     // Buyer lists their own RFQs
     public function index()
     {
-        $rfqs = Rfq::where('buyer_id', Auth::id())->with('category', 'responses')->get();
-        return response()->json(['status' => 'success', 'data' => $rfqs]);
+        $rfqs = Rfq::where('buyer_id', Auth::id())
+            ->with(['category', 'responses.seller.sellerProfile'])
+            ->latest()
+            ->get()
+            ->map(fn ($rfq) => $this->formatRfq($rfq));
+
+        return response()->json($rfqs);
     }
 
     // Public board for Sellers to browse open RFQs
     public function marketplace()
     {
-        $rfqs = Rfq::where('status', 'open')->with('category')->latest()->get();
-        return response()->json(['status' => 'success', 'data' => $rfqs]);
+        $rfqs = Rfq::where('status', 'open')
+            ->with(['category', 'buyer', 'responses' => function ($query) {
+                $query->where('seller_id', Auth::id());
+            }])
+            ->latest()
+            ->get()
+            ->map(fn ($rfq) => $this->formatRfq($rfq));
+
+        return response()->json($rfqs);
     }
 
     public function store(Request $request)
     {
+        $request->merge([
+            'product_name' => $request->input('product_name', $request->input('title')),
+            'category_id' => $request->input('category_id', $request->input('categoryId')),
+            'expected_price' => $request->input('expected_price', $request->input('targetPrice')),
+            'unit' => $request->input('unit', 'units'),
+        ]);
+
         $request->validate([
             'product_name' => 'required|string|max:255',
             'description' => 'required',
@@ -55,6 +74,11 @@ class RfqController extends Controller
     // Seller responding to RFQ
     public function respond(Request $request, $rfq_id)
     {
+        $request->merge([
+            'offered_price' => $request->input('offered_price', $request->input('priceQuote')),
+            'message' => $request->input('message', $request->input('notes')),
+        ]);
+
         $request->validate([
             'offered_price' => 'required|numeric',
             'message' => 'nullable|string',
@@ -73,5 +97,80 @@ class RfqController extends Controller
             'message' => 'Quote submitted to buyer',
             'data' => $response
         ]);
+    }
+
+    public function respondFromBody(Request $request)
+    {
+        $request->validate([
+            'rfqId' => 'required|exists:rfqs,id',
+        ]);
+
+        return $this->respond($request, $request->rfqId);
+    }
+
+    public function selectResponse(int $id)
+    {
+        $response = RfqResponse::with('rfq')->findOrFail($id);
+
+        if ($response->rfq->buyer_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        RfqResponse::where('rfq_id', $response->rfq_id)->update(['status' => 'rejected']);
+        $response->update(['status' => 'accepted']);
+        $response->rfq->update(['status' => 'closed']);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Quotation accepted successfully',
+            'data' => $this->formatRfq($response->rfq->fresh(['category', 'responses.seller.sellerProfile'])),
+        ]);
+    }
+
+    private function formatRfq(Rfq $rfq): array
+    {
+        return [
+            'id' => (string) $rfq->id,
+            'title' => $rfq->product_name,
+            'product_name' => $rfq->product_name,
+            'description' => $rfq->description,
+            'quantity' => (float) $rfq->quantity,
+            'unit' => $rfq->unit,
+            'targetPrice' => $rfq->expected_price ? (float) $rfq->expected_price : null,
+            'expected_price' => $rfq->expected_price,
+            'status' => match ($rfq->status) {
+                'open' => $rfq->responses->count() > 0 ? 'RESPONDED' : 'PENDING',
+                'closed' => 'CLOSED',
+                default => strtoupper($rfq->status),
+            },
+            'createdAt' => optional($rfq->created_at)->toIso8601String(),
+            'category' => $rfq->category ? [
+                'id' => (string) $rfq->category->id,
+                'name' => $rfq->category->name,
+            ] : ['id' => '', 'name' => 'General'],
+            'buyer' => $rfq->buyer ? [
+                'id' => (string) $rfq->buyer->id,
+                'name' => $rfq->buyer->name,
+                'email' => $rfq->buyer->email,
+            ] : null,
+            'responses' => $rfq->responses->map(fn ($response) => [
+                'id' => (string) $response->id,
+                'sellerId' => (string) $response->seller_id,
+                'priceQuote' => (float) $response->offered_price,
+                'leadTimeDays' => 5,
+                'notes' => $response->message,
+                'status' => strtoupper($response->status),
+                'createdAt' => optional($response->created_at)->toIso8601String(),
+                'seller' => $response->seller ? [
+                    'id' => (string) $response->seller->id,
+                    'name' => $response->seller->name,
+                    'email' => $response->seller->email,
+                    'profile' => [
+                        'companyName' => $response->seller->sellerProfile?->company_name,
+                        'isVerified' => (bool) $response->seller->sellerProfile?->is_verified,
+                    ],
+                ] : null,
+            ])->values(),
+        ];
     }
 }

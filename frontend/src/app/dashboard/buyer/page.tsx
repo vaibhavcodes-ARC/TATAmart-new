@@ -22,7 +22,6 @@ import {
   X,
   AlertCircle
 } from 'lucide-react';
-import Link from 'next/link';
 
 interface Category {
   id: string;
@@ -95,9 +94,10 @@ export default function BuyerDashboard() {
         api.get('/categories')
       ]);
       setRfqs(rfqRes.data);
-      setCategories(catRes.data);
-      if (catRes.data.length > 0) {
-        setFormCategory(catRes.data[0].id);
+      const categoriesData = catRes.data?.data || catRes.data || [];
+      setCategories(categoriesData);
+      if (categoriesData.length > 0) {
+        setFormCategory(String(categoriesData[0].id));
       }
     } catch (err) {
       console.error('Failed to load procurement details:', err);
@@ -367,7 +367,7 @@ export default function BuyerDashboard() {
                                   ₹{quote.priceQuote.toLocaleString()}/unit
                                 </span>
                               </div>
-                              <p className="text-xs text-zinc-500 mb-3">"{quote.notes || 'No extra supplier notes provided.'}"</p>
+                              <p className="text-xs text-zinc-500 mb-3">&quot;{quote.notes || 'No extra supplier notes provided.'}&quot;</p>
                             </div>
                             <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-3">
                               <span className="text-xs text-zinc-400 font-bold flex items-center gap-1">

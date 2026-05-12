@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Inquiry;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
@@ -58,6 +59,15 @@ class ProductController extends Controller
     // Seller action
     public function store(Request $request)
     {
+        $request->merge([
+            'category_id' => $request->input('category_id', $request->input('categoryId')),
+            'name' => $request->input('name', $request->input('title')),
+            'short_description' => $request->input('short_description', $request->input('description')),
+            'price_min' => $request->input('price_min', $request->input('price')),
+            'price_max' => $request->input('price_max', $request->input('price')),
+            'min_order_quantity' => $request->input('min_order_quantity', $request->input('moq', 1)),
+        ]);
+
         $request->validate([
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',
@@ -88,6 +98,12 @@ class ProductController extends Controller
                 'image_path' => $request->image_url,
                 'is_primary' => true
             ]);
+        } elseif ($request->filled('images') && is_array($request->images) && count($request->images) > 0) {
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image_path' => $request->images[0],
+                'is_primary' => true
+            ]);
         } else {
             // Default placeholder
             ProductImage::create([
@@ -111,5 +127,77 @@ class ProductController extends Controller
             'status' => 'success',
             'data' => $products
         ]);
+    }
+
+    public function update(Request $request, int $id)
+    {
+        $product = Product::where('seller_id', Auth::id())->findOrFail($id);
+
+        $payload = [];
+        if ($request->has('title') || $request->has('name')) {
+            $payload['name'] = $request->input('name', $request->input('title'));
+        }
+        if ($request->has('description') || $request->has('short_description')) {
+            $payload['short_description'] = $request->input('short_description', $request->input('description'));
+        }
+        if ($request->has('price') || $request->has('price_min')) {
+            $payload['price_min'] = $request->input('price_min', $request->input('price'));
+        }
+        if ($request->has('moq') || $request->has('min_order_quantity')) {
+            $payload['min_order_quantity'] = $request->input('min_order_quantity', $request->input('moq'));
+        }
+
+        $product->update($payload);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Product updated successfully',
+            'data' => $product->fresh(['category', 'primaryImage']),
+        ]);
+    }
+
+    public function destroy(int $id)
+    {
+        $query = Product::query();
+        if (! Auth::user()?->isAdmin()) {
+            $query->where('seller_id', Auth::id());
+        }
+
+        $product = $query->findOrFail($id);
+        $product->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Product removed successfully',
+        ]);
+    }
+
+    public function inquire(Request $request)
+    {
+        $request->merge([
+            'product_id' => $request->input('product_id', $request->input('productId')),
+        ]);
+
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'message' => 'required|string|min:3',
+            'quantity' => 'nullable|string',
+        ]);
+
+        $product = Product::findOrFail($request->product_id);
+
+        $inquiry = Inquiry::create([
+            'buyer_id' => Auth::id(),
+            'seller_id' => $product->seller_id,
+            'product_id' => $product->id,
+            'message' => $request->message,
+            'quantity' => $request->quantity,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Inquiry sent successfully',
+            'data' => $inquiry,
+        ], 201);
     }
 }

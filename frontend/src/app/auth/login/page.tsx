@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { api } from '../../../utils/api';
+import { api, getApiErrorMessage } from '../../../utils/api';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight } from 'lucide-react';
 
 export default function Login() {
   const router = useRouter();
@@ -27,9 +27,8 @@ export default function Login() {
       const { token, user } = response.data;
       loginStore(token, user);
       router.push('/');
-    } catch (err: any) {
-      console.error(err);
-      setError(err.response?.data?.message || 'Invalid email or password');
+    } catch (err: unknown) {
+      setError(getApiErrorMessage(err, 'Invalid email or password'));
     } finally {
       setLoading(false);
     }
@@ -124,7 +123,7 @@ export default function Login() {
           </form>
 
           <div className="mt-8 text-center text-xs font-semibold text-zinc-400 border-t border-zinc-800/80 pt-6">
-            <span>Don't have an account? </span>
+            <span>Don&apos;t have an account? </span>
             <Link href="/auth/register" className="text-indigo-400 hover:text-indigo-300" id="link-register">
               Create an Account
             </Link>

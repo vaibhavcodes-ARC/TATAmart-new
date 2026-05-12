@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../../../components/Header';
 import { api } from '../../../utils/api';
-import { motion } from 'framer-motion';
 import { Users, ShoppingBag, FileText, CheckCircle2, ShieldAlert, Trash2, ShieldCheck, Database, Server } from 'lucide-react';
 
 interface User {

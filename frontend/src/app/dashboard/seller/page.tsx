@@ -7,9 +7,7 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import {
   TrendingUp,
-  MailOpen,
   Clock,
-  AlertCircle,
   ShoppingCart,
   Percent,
   Tag,
@@ -18,10 +16,8 @@ import {
   Send,
   CheckCircle2,
   ShieldCheck,
-  Briefcase,
   Truck,
-  Box,
-  Layers
+  Box
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -52,6 +48,23 @@ interface Product {
   moq: number;
   stock: number;
   categoryId: string;
+  sellerId?: string;
+}
+
+interface BackendProduct {
+  id: string | number;
+  name?: string;
+  title?: string;
+  short_description?: string;
+  description?: string;
+  price_min?: string | number;
+  price?: string | number;
+  min_order_quantity?: string | number;
+  moq?: string | number;
+  category?: { name?: string };
+  category_id?: string | number;
+  seller_id?: string | number;
+  sellerId?: string | number;
 }
 
 interface RfqLeads {
@@ -84,7 +97,7 @@ export default function SellerDashboard() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [rfqLeads, setRfqLeads] = useState<RfqLeads[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Array<{ id: string; shippingAdd: string; total: number; status: string; createdAt: string }>>([]);
   const [loading, setLoading] = useState(true);
 
   // Add Product Form State
@@ -116,11 +129,23 @@ export default function SellerDashboard() {
       setRfqLeads(rfqLeadsRes.data);
       setOrders(ordersRes.data);
 
+      const productsData = productsRes.data?.data?.data || productsRes.data?.data || productsRes.data || [];
+      const mappedProducts = productsData.map((p: BackendProduct) => ({
+        id: String(p.id),
+        title: p.name || p.title || 'Untitled product',
+        description: p.short_description || p.description || '',
+        price: Number(p.price_min || p.price || 0),
+        moq: Number(p.min_order_quantity || p.moq || 1),
+        stock: 100,
+        categoryId: String(p.category?.name || p.category_id || ''),
+        sellerId: String(p.seller_id || p.sellerId || ''),
+      }));
+
       // Filter products only owned by this seller
       if (user) {
-        setProducts(productsRes.data.filter((p: any) => p.sellerId === user.id));
+        setProducts(mappedProducts.filter((p: Product) => p.sellerId === String(user.id)));
       } else {
-        setProducts(productsRes.data);
+        setProducts(mappedProducts);
       }
     } catch (error) {
       console.error('Error fetching seller command center data:', error);
@@ -146,15 +171,15 @@ export default function SellerDashboard() {
     e.preventDefault();
     try {
       const categoriesRes = await api.get('/categories');
-      const activeCategory = prodCategory || categoriesRes.data[0]?.id;
+      const categoriesData = categoriesRes.data?.data || categoriesRes.data || [];
+      const activeCategory = prodCategory || categoriesData[0]?.id;
 
       const newProd = {
-        title: prodTitle,
-        description: prodDesc,
-        price: Number(prodPrice),
-        moq: Number(prodMoq),
-        stock: Number(prodStock),
-        categoryId: activeCategory,
+        name: prodTitle,
+        short_description: prodDesc,
+        price_min: Number(prodPrice),
+        min_order_quantity: Number(prodMoq),
+        category_id: activeCategory,
         images: ['https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop'],
       };
 
@@ -202,7 +227,7 @@ export default function SellerDashboard() {
       await api.post('/rfqs/respond', {
         rfqId: biddingRfq.id,
         priceQuote: parseFloat(bidPrice),
-        leadTimeDays: parseInt(bidLeadTime),
+        leadTimeDays: parseInt(bidLeadTime, 10),
         notes: bidNotes,
       });
 
@@ -518,7 +543,7 @@ export default function SellerDashboard() {
                         </div>
 
                         <p className="text-xs text-zinc-500 bg-zinc-50 p-3.5 rounded-xl border border-zinc-100 dark:bg-zinc-950/50 dark:border-zinc-800/30 mt-4 leading-relaxed">
-                          "{rfq.description}"
+                          &quot;{rfq.description}&quot;
                         </p>
                       </div>
 

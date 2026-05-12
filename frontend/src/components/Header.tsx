@@ -3,15 +3,28 @@
 import React from 'react';
 import Link from 'next/link';
 import { useAuthStore } from '../store/useAuthStore';
-import { ShoppingBag, User as UserIcon, LogOut, ArrowRight } from 'lucide-react';
+import { api } from '../utils/api';
+import { User as UserIcon, LogOut, ArrowRight, Menu, X } from 'lucide-react';
 
 export default function Header() {
   const { user, logout, isAuthenticated } = useAuthStore();
   const [mounted, setMounted] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // Local logout should still complete if the token is expired or the API is offline.
+    } finally {
+      logout();
+      setMenuOpen(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-200/50 bg-white/75 backdrop-blur-md dark:border-zinc-800/50 dark:bg-zinc-950/75">
@@ -69,7 +82,7 @@ export default function Header() {
         </nav>
 
         {/* User Auth Controls */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           {mounted ? (
             isAuthenticated && user ? (
               <div className="flex items-center space-x-3">
@@ -80,7 +93,7 @@ export default function Header() {
                   </span>
                 </div>
                 <button
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="flex items-center justify-center h-9 w-9 rounded-xl bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white transition-all shadow-sm"
                   title="Log Out"
                   id="btn-logout"
@@ -110,8 +123,36 @@ export default function Header() {
           ) : (
             <div className="h-9 w-20"></div>
           )}
+          <button
+            onClick={() => setMenuOpen((value) => !value)}
+            className="md:hidden flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-200/60 bg-white text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+            aria-label="Toggle navigation"
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
       </div>
+      {menuOpen && (
+        <div className="border-t border-zinc-200/60 bg-white px-6 py-4 shadow-lg dark:border-zinc-800 dark:bg-zinc-950 md:hidden">
+          <nav className="flex flex-col gap-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+            <Link href="/" onClick={() => setMenuOpen(false)}>Home</Link>
+            <Link href="/products" onClick={() => setMenuOpen(false)}>Explore Products</Link>
+            <Link href="/categories" onClick={() => setMenuOpen(false)}>Categories</Link>
+            {mounted && isAuthenticated && user?.role === 'BUYER' && (
+              <>
+                <Link href="/dashboard/buyer" onClick={() => setMenuOpen(false)}>My Inquiries</Link>
+                <Link href="/cart" onClick={() => setMenuOpen(false)}>Cart</Link>
+              </>
+            )}
+            {mounted && isAuthenticated && user?.role === 'SELLER' && (
+              <Link href="/dashboard/seller" onClick={() => setMenuOpen(false)}>Seller Portal</Link>
+            )}
+            {mounted && isAuthenticated && user?.role === 'ADMIN' && (
+              <Link href="/dashboard/admin" onClick={() => setMenuOpen(false)}>Admin Panel</Link>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
