@@ -29,11 +29,10 @@ class CartController extends Controller
         $cart = $this->cartRepository->getCartByUserId($request->user()->id);
         $totals = $this->cartService->calculateCartTotals($request->user()->id);
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse([
             'cart' => $cart,
             'summary' => $totals
-        ]);
+        ], 'Cart retrieved successfully');
     }
 
     /**
@@ -48,17 +47,9 @@ class CartController extends Controller
                 $request->input('quantity')
             );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Product added to cart successfully',
-                'data' => $item
-            ]);
-
+            return $this->successResponse($item, 'Product added to cart successfully');
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 422);
+            return $this->errorResponse($e->getMessage(), 422);
         }
     }
 
@@ -72,7 +63,7 @@ class CartController extends Controller
         $item = \App\Models\CartItem::findOrFail($itemId);
         $item->update(['quantity' => $request->input('quantity')]);
 
-        return response()->json(['success' => true]);
+        return $this->successResponse($item, 'Cart updated');
     }
 
     /**
@@ -82,6 +73,6 @@ class CartController extends Controller
     {
         $item = \App\Models\CartItem::findOrFail($itemId);
         $item->delete();
-        return response()->json(['success' => true]);
+        return $this->successResponse([], 'Item removed from cart');
     }
 }

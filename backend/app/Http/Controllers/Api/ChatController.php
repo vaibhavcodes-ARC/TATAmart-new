@@ -25,10 +25,7 @@ class ChatController extends Controller
             ->orderBy('last_message_at', 'desc')
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $conversations
-        ]);
+        return $this->successResponse($conversations, 'Conversations retrieved successfully');
     }
 
     /**
@@ -51,10 +48,7 @@ class ChatController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $messages
-        ]);
+        return $this->successResponse($messages, 'Messages retrieved successfully');
     }
 
     /**
@@ -89,9 +83,6 @@ class ChatController extends Controller
         // ⚡ FIRE THE BROADCAST ENGINE IN REALTIME
         broadcast(new ChatMessageSent($message))->toOthers();
 
-        return response()->json([
-            'success' => true,
-            'data' => $message->load('sender')
-        ], 201);
+        return $this->successResponse($message->load('sender'), 'Message sent successfully', 201);
     }
 }

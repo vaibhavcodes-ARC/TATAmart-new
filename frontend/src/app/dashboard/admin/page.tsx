@@ -3,7 +3,24 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../../../components/Header';
 import { api } from '../../../utils/api';
-import { Users, ShoppingBag, FileText, CheckCircle2, ShieldAlert, Trash2, ShieldCheck, Database, Server } from 'lucide-react';
+import Antigravity from '../../../components/animations/Antigravity';
+import {
+  Users,
+  ShoppingBag,
+  FileText,
+  CheckCircle2,
+  ShieldAlert,
+  Trash2,
+  ShieldCheck,
+  Database,
+  Server,
+  Activity,
+  Cpu,
+  Building2,
+  Mail,
+  XCircle
+} from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface User {
   id: string;
@@ -51,9 +68,9 @@ export default function AdminDashboard() {
         api.get('/admin/products'),
         api.get('/admin/stats'),
       ]);
-      setUsers(usersRes.data);
-      setProducts(productsRes.data);
-      setStats(statsRes.data);
+      setUsers(usersRes.data.data || usersRes.data);
+      setProducts(productsRes.data.data || productsRes.data);
+      setStats(statsRes.data.data || statsRes.data);
     } catch (error) {
       console.error('Error loading admin data:', error);
     } finally {
@@ -67,7 +84,6 @@ export default function AdminDashboard() {
 
   const handleToggleVerification = async (userId: string, currentStatus: boolean) => {
     try {
-      // Optimistic update
       setUsers((prev) =>
         prev.map((u) =>
           u.id === userId
@@ -78,7 +94,7 @@ export default function AdminDashboard() {
       await api.put(`/admin/users/${userId}/verify`, { isVerified: !currentStatus });
     } catch (error) {
       console.error('Failed to toggle verification:', error);
-      fetchData(); // Revert
+      fetchData();
     }
   };
 
@@ -94,167 +110,202 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50 font-monoenterprise">
+    <div className="min-h-screen bg-[#fafafc] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-50 pt-24 selection:bg-brand-primary selection:text-white">
+      <div className="fixed inset-0 z-0 opacity-10 pointer-events-none">
+        <Antigravity count={200} color="#8b5cf6" particleShape="box" />
+      </div>
       <Header />
 
-      <main className="mx-auto max-w-7xl px-6 py-12 sm:px-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-zinc-200/50 dark:border-zinc-800/50">
+      <main className="mx-auto max-w-7xl px-6 py-12 sm:px-8 relative z-10">
+        {/* Command Bar Top Section */}
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between mb-12 pb-8 border-b border-zinc-200/60 dark:border-zinc-800/60 gap-8">
           <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Admin Operations</span>
-            <h1 className="text-3xl font-black tracking-tight mt-1 flex items-center gap-2">
-              <Database className="h-7 w-7 text-indigo-500" />
-              <span>Platform Control Center</span>
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-brand-primary bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-full mb-3">
+              <Cpu className="h-3 w-3" />
+              <span>Platform Operations Node</span>
+            </span>
+            <h1 className="font-hero text-3xl sm:text-4xl font-black tracking-tight text-zinc-950 dark:text-white mt-1 flex flex-wrap items-center gap-3">
+              <Database className="h-8 w-8 text-brand-primary" />
+              <span>Hyper-V Control Panel</span>
             </h1>
+            <p className="text-[13px] font-medium text-zinc-500 dark:text-zinc-400 mt-1.5">Oversee secure ledger activity, coordinate verified node clearances, and moderate physical assets.</p>
           </div>
-          <div className="flex items-center space-x-3 bg-zinc-100 dark:bg-zinc-900 px-4 py-2 rounded-xl text-xs font-bold text-zinc-500 dark:text-zinc-400">
-            <Server className="h-4 w-4 text-emerald-500 animate-pulse" />
-            <span>Elasticsearch Cluster: ONLINE</span>
+
+          {/* Telemetry Widget */}
+          <div className="flex items-center space-x-3 bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60 px-5 py-3 rounded-[24px] text-[11px] font-black uppercase tracking-wider shadow-sm">
+            <div className="flex h-2.5 w-2.5 relative items-center justify-center">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+            </div>
+            <Server className="h-4 w-4 text-zinc-400" />
+            <span className="text-zinc-600 dark:text-zinc-300">Platform Mesh: <span className="text-emerald-600 font-black">HEALTHY</span></span>
           </div>
         </div>
 
         {loading ? (
-          <div className="py-20 flex items-center justify-center">
-            <div className="h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="py-32 flex items-center justify-center">
+            <div className="h-10 w-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
           <>
-            {/* Stats Overview */}
+            {/* Enterprise metrics log */}
             {stats && (
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-10">
-                <div className="rounded-2xl bg-white p-6 shadow-sm border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 flex items-center space-x-4">
-                  <div className="p-3.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div className="rounded-[28px] bg-white border border-zinc-200/60 p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800/60 group hover:shadow-md transition-all duration-300 flex items-center space-x-5">
+                  <div className="h-12 w-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-brand-primary dark:text-indigo-400 flex items-center justify-center shrink-0">
                     <Users className="h-6 w-6" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Total Users</span>
-                    <h3 className="text-2xl font-black">{stats.totalUsers}</h3>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Total Subscriptions</span>
+                    <h3 className="font-hero text-2xl font-black text-zinc-950 dark:text-white leading-none mt-1">{stats.totalUsers}</h3>
                   </div>
                 </div>
 
-                <div className="rounded-2xl bg-white p-6 shadow-sm border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 flex items-center space-x-4">
-                  <div className="p-3.5 bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 rounded-xl">
+                <div className="rounded-[28px] bg-white border border-zinc-200/60 p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800/60 group hover:shadow-md transition-all duration-300 flex items-center space-x-5">
+                  <div className="h-12 w-12 rounded-2xl bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
                     <ShoppingBag className="h-6 w-6" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Moderated Products</span>
-                    <h3 className="text-2xl font-black">{stats.totalProducts}</h3>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Catalog Entities</span>
+                    <h3 className="font-hero text-2xl font-black text-zinc-950 dark:text-white leading-none mt-1">{stats.totalProducts}</h3>
                   </div>
                 </div>
 
-                <div className="rounded-2xl bg-white p-6 shadow-sm border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 flex items-center space-x-4">
-                  <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-xl">
+                <div className="rounded-[28px] bg-white border border-zinc-200/60 p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800/60 group hover:shadow-md transition-all duration-300 flex items-center space-x-5">
+                  <div className="h-12 w-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                     <FileText className="h-6 w-6" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Active Inquiries</span>
-                    <h3 className="text-2xl font-black">{stats.totalInquiries}</h3>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Active Rfqs</span>
+                    <h3 className="font-hero text-2xl font-black text-zinc-950 dark:text-white leading-none mt-1">{stats.totalInquiries}</h3>
                   </div>
                 </div>
 
-                <div className="rounded-2xl bg-white p-6 shadow-sm border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 flex items-center space-x-4">
-                  <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                <div className="rounded-[28px] bg-white border border-zinc-200/60 p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800/60 group hover:shadow-md transition-all duration-300 flex items-center space-x-5">
+                  <div className="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                     <CheckCircle2 className="h-6 w-6" />
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Placed Orders</span>
-                    <h3 className="text-2xl font-black">{stats.totalOrders}</h3>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Executed Invoices</span>
+                    <h3 className="font-hero text-2xl font-black text-zinc-950 dark:text-white leading-none mt-1">{stats.totalOrders}</h3>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Navigation Tabs */}
-            <div className="flex space-x-3 mb-8 border-b border-zinc-200/40 dark:border-zinc-800/40 pb-4">
-              <button
-                onClick={() => setActiveTab('users')}
-                className={`py-2 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
-                  activeTab === 'users'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'bg-white dark:bg-zinc-900 border border-zinc-200/30 dark:border-zinc-800/30 text-zinc-500 hover:text-zinc-800'
-                }`}
-              >
-                Enterprise Accounts
-              </button>
-              <button
-                onClick={() => setActiveTab('products')}
-                className={`py-2 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
-                  activeTab === 'products'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'bg-white dark:bg-zinc-900 border border-zinc-200/30 dark:border-zinc-800/30 text-zinc-500 hover:text-zinc-800'
-                }`}
-              >
-                Catalog Moderation
-              </button>
+            {/* Navigation sliding switchers */}
+            <div className="flex items-center mb-8 pb-2">
+              <div className="flex items-center gap-2 bg-white border border-zinc-200/60 p-1.5 rounded-[24px] dark:bg-zinc-900 dark:border-zinc-800/60 shadow-sm">
+                <button
+                  onClick={() => setActiveTab('users')}
+                  className={`py-2.5 px-5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all whitespace-nowrap active:scale-95 ${
+                    activeTab === 'users'
+                      ? 'bg-brand-primary text-white shadow-lg shadow-indigo-600/15'
+                      : 'text-zinc-400 hover:text-zinc-800 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  Enterprise Accounts
+                </button>
+                <button
+                  onClick={() => setActiveTab('products')}
+                  className={`py-2.5 px-5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all whitespace-nowrap active:scale-95 ${
+                    activeTab === 'products'
+                      ? 'bg-brand-primary text-white shadow-lg shadow-indigo-600/15'
+                      : 'text-zinc-400 hover:text-zinc-800 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  Catalog Moderation
+                </button>
+              </div>
             </div>
 
-            {/* Responsive Tables */}
-            <div className="rounded-2xl bg-white shadow-sm border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 overflow-hidden">
+            {/* Premium Table UI Blocks */}
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-[36px] bg-white shadow-xl shadow-indigo-600/[0.01] border border-zinc-200/60 dark:bg-zinc-900 dark:border-zinc-800/60 overflow-hidden mb-20"
+            >
               {activeTab === 'users' ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-zinc-50 dark:bg-zinc-950 text-[10px] font-bold uppercase tracking-wider text-zinc-400 border-b border-zinc-100 dark:border-zinc-800">
-                        <th className="p-5">Representative Name</th>
-                        <th className="p-5">Corporate Email</th>
-                        <th className="p-5">Role</th>
-                        <th className="p-5">Company & GST Details</th>
-                        <th className="p-5 text-right">Moderation Controls</th>
+                      <tr className="bg-zinc-50/50 dark:bg-zinc-950 text-[10px] font-black uppercase tracking-widest text-zinc-400 border-b border-zinc-100 dark:border-zinc-800">
+                        <th className="p-6">Enterprise Operator</th>
+                        <th className="p-6">Email Protocol</th>
+                        <th className="p-6">Role Class</th>
+                        <th className="p-6">Company & Corporate Identification</th>
+                        <th className="p-6 text-right">Clearance Pipeline</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-xs font-semibold">
-                      {users.map((u) => (
-                        <tr key={u.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 transition-all">
-                          <td className="p-5 font-bold text-zinc-900 dark:text-white">{u.name}</td>
-                          <td className="p-5 text-zinc-500">{u.email}</td>
-                          <td className="p-5">
-                            <span className={`inline-flex py-1 px-2 rounded-lg text-[10px] font-bold ${
-                              u.role === 'SELLER'
-                                ? 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400'
-                                : u.role === 'ADMIN'
-                                ? 'bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400'
-                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600'
-                            }`}>
-                              {u.role}
-                            </span>
-                          </td>
-                          <td className="p-5">
-                            {u.profile ? (
-                              <div className="flex flex-col">
-                                <span className="font-bold text-zinc-800 dark:text-zinc-300">{u.profile.companyName}</span>
-                                <span className="text-[10px] text-zinc-500 mt-0.5">GST: {u.profile.gstNumber || 'N/A'}</span>
-                              </div>
-                            ) : (
-                              <span className="text-zinc-400">Profile Pending Seeding</span>
-                            )}
-                          </td>
-                          <td className="p-5 text-right">
-                            {u.role === 'SELLER' && u.profile ? (
-                              <button
-                                onClick={() => handleToggleVerification(u.id, u.profile!.isVerified)}
-                                className={`inline-flex items-center space-x-1 py-1.5 px-3 rounded-lg text-[10px] font-bold transition-all border ${
-                                  u.profile.isVerified
-                                    ? 'bg-emerald-50 border-emerald-200/50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30'
-                                    : 'bg-zinc-100 border-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700'
-                                }`}
-                              >
-                                {u.profile.isVerified ? (
-                                  <>
-                                    <ShieldCheck className="h-3.5 w-3.5" />
-                                    <span>Verified</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <ShieldAlert className="h-3.5 w-3.5" />
-                                    <span>Unverified (Approve)</span>
-                                  </>
-                                )}
-                              </button>
-                            ) : (
-                              <span className="text-zinc-400">-</span>
-                            )}
-                          </td>
+                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-[13px] font-medium text-zinc-500 dark:text-zinc-400">
+                      {users.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="p-12 text-center text-xs text-zinc-400">No active directories detected.</td>
                         </tr>
-                      ))}
+                      ) : (
+                        users.map((u) => (
+                          <tr key={u.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-850/20 transition-all">
+                            <td className="p-6 font-bold text-zinc-950 dark:text-white">{u.name}</td>
+                            <td className="p-6 max-w-xs truncate">
+                              <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-xs">
+                                <Mail className="h-3.5 w-3.5 text-zinc-300" />
+                                <span>{u.email}</span>
+                              </div>
+                            </td>
+                            <td className="p-6">
+                              <span className={`inline-flex py-1 px-2.5 rounded-lg text-[10px] font-black uppercase tracking-wider ${
+                                u.role === 'SELLER'
+                                  ? 'bg-indigo-50 dark:bg-indigo-950/40 text-brand-primary dark:text-indigo-400'
+                                  : u.role === 'ADMIN'
+                                  ? 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400'
+                                  : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'
+                              }`}>
+                                {u.role}
+                              </span>
+                            </td>
+                            <td className="p-6">
+                              {u.profile ? (
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-zinc-950 dark:text-white flex items-center gap-1.5">
+                                    <Building2 className="h-3.5 w-3.5 text-zinc-300" />
+                                    {u.profile.companyName}
+                                  </span>
+                                  <span className="text-[10px] text-zinc-400 mt-1 font-bold bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-500 px-2 py-0.5 rounded inline-flex w-fit">GST: {u.profile.gstNumber || 'N/A'}</span>
+                                </div>
+                              ) : (
+                                <span className="text-[11px] italic font-bold text-zinc-400">Incomplete Ledger Profile</span>
+                              )}
+                            </td>
+                            <td className="p-6 text-right">
+                              {u.role === 'SELLER' && u.profile ? (
+                                <button
+                                  onClick={() => handleToggleVerification(u.id, u.profile!.isVerified)}
+                                  className={`inline-flex items-center space-x-1.5 py-2 px-4 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 border ${
+                                    u.profile.isVerified
+                                      ? 'bg-emerald-50 border-emerald-100 text-emerald-600 shadow-md shadow-emerald-500/5 dark:bg-emerald-950/30 dark:border-emerald-900/30 dark:text-emerald-400'
+                                      : 'bg-amber-50 border-amber-100 text-amber-600 dark:bg-amber-950/30 dark:border-amber-900/30 dark:text-amber-400 animate-pulse'
+                                  }`}
+                                >
+                                  {u.profile.isVerified ? (
+                                    <>
+                                      <ShieldCheck className="h-3.5 w-3.5" />
+                                      <span>Verified Node</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <ShieldAlert className="h-3.5 w-3.5" />
+                                      <span>Clearance Req</span>
+                                    </>
+                                  )}
+                                </button>
+                              ) : (
+                                <span className="text-[11px] font-bold text-zinc-300 dark:text-zinc-700">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -262,44 +313,56 @@ export default function AdminDashboard() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-zinc-50 dark:bg-zinc-950 text-[10px] font-bold uppercase tracking-wider text-zinc-400 border-b border-zinc-100 dark:border-zinc-800">
-                        <th className="p-5">Product Specification Title</th>
-                        <th className="p-5">Industrial Niche</th>
-                        <th className="p-5">Unit Price</th>
-                        <th className="p-5">Registered Manufacturer</th>
-                        <th className="p-5 text-right">Moderation Controls</th>
+                      <tr className="bg-zinc-50/50 dark:bg-zinc-950 text-[10px] font-black uppercase tracking-widest text-zinc-400 border-b border-zinc-100 dark:border-zinc-800">
+                        <th className="p-6">Assembly Specifications</th>
+                        <th className="p-6">Niche Taxonomy</th>
+                        <th className="p-6">Base Invoice Rate</th>
+                        <th className="p-6">Affiliated OEM Node</th>
+                        <th className="p-6 text-right">Moderation Pipeline</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-xs font-semibold">
-                      {products.map((p) => (
-                        <tr key={p.id} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-950/20 transition-all">
-                          <td className="p-5 font-bold text-zinc-900 dark:text-white">{p.title}</td>
-                          <td className="p-5 uppercase text-[10px] font-bold text-indigo-500">{p.categoryId}</td>
-                          <td className="p-5 font-bold">₹{p.price.toLocaleString()}</td>
-                          <td className="p-5">
-                            <div className="flex flex-col">
-                              <span className="font-bold">{p.seller.name}</span>
-                              <span className="text-[10px] text-zinc-500 mt-0.5">{p.seller.email}</span>
-                            </div>
-                          </td>
-                          <td className="p-5 text-right">
-                            <button
-                              onClick={() => handleDeleteProduct(p.id)}
-                              className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-all"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </td>
+                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-[13px] font-medium text-zinc-500 dark:text-zinc-400">
+                      {products.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="p-12 text-center text-xs text-zinc-400">Active catalog is empty.</td>
                         </tr>
-                      ))}
+                      ) : (
+                        products.map((p) => (
+                          <tr key={p.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-850/20 transition-all">
+                            <td className="p-6 font-bold text-zinc-950 dark:text-white max-w-md truncate">{p.title}</td>
+                            <td className="p-6">
+                              <span className="text-[10px] font-black uppercase tracking-wider text-brand-primary bg-indigo-50 dark:bg-indigo-950/40 px-2.5 py-1 rounded-md">
+                                {p.categoryId}
+                              </span>
+                            </td>
+                            <td className="p-6 font-bold text-zinc-950 dark:text-white">₹{p.price.toLocaleString()}</td>
+                            <td className="p-6">
+                              <div className="flex flex-col">
+                                <span className="font-bold text-zinc-950 dark:text-white">{p.seller?.name || 'Unknown Operator'}</span>
+                                <span className="text-[10px] text-zinc-400 mt-0.5 font-mono truncate max-w-[160px]">{p.seller?.email || ''}</span>
+                              </div>
+                            </td>
+                            <td className="p-6 text-right">
+                              <button
+                                onClick={() => handleDeleteProduct(p.id)}
+                                className="h-9 w-9 rounded-xl border border-zinc-200 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-200 dark:border-zinc-800 dark:text-zinc-500 dark:hover:text-rose-400 dark:hover:bg-rose-950/30 inline-flex items-center justify-center transition-all"
+                                title="Revoke Asset From Mesh"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
               )}
-            </div>
+            </motion.div>
           </>
         )}
       </main>
     </div>
   );
 }
+

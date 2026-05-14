@@ -20,7 +20,11 @@ import {
   ArrowRight,
   User,
   X,
-  AlertCircle
+  AlertCircle,
+  Layers,
+  LayoutDashboard,
+  Activity,
+  DollarSign
 } from 'lucide-react';
 
 interface Category {
@@ -93,7 +97,7 @@ export default function BuyerDashboard() {
         api.get('/rfqs/buyer'),
         api.get('/categories')
       ]);
-      setRfqs(rfqRes.data);
+      setRfqs(rfqRes.data.data || rfqRes.data);
       const categoriesData = catRes.data?.data || catRes.data || [];
       setCategories(categoriesData);
       if (categoriesData.length > 0) {
@@ -144,7 +148,6 @@ export default function BuyerDashboard() {
       await api.post(`/rfqs/responses/${quote.id}/select`);
       
       // 2. Clear previous cart, and insert this quote product/seller dynamically
-      // To simulate immediate checkout, we open the Checkout Overlay for this selected response
       setCheckoutRfq(rfq);
       setCheckoutResponse(quote);
     } catch (err) {
@@ -159,25 +162,21 @@ export default function BuyerDashboard() {
     try {
       setCheckoutSubmitting(true);
       
-      // We populate direct checkout cart
       await api.post('/cart', {
-        productId: checkoutRfq.product?.id || 'seeded-product-id', // fallback if general RFQ
+        productId: checkoutRfq.product?.id || 'seeded-product-id',
         quantity: checkoutRfq.quantity,
       });
 
-      // Post final order creation with selected quotation reference
       await api.post('/orders', {
         shippingAdd: checkoutShipping || 'Enterprise Headquarters, Block C, Sector 62, Noida, UP - 201301',
         rfqResponseId: checkoutResponse.id,
       });
 
-      // Clear checkout overlay and open stunning success modal
       setCheckoutRfq(null);
       setCheckoutResponse(null);
       setCheckoutShipping('');
       setSuccessModal(true);
 
-      // Refresh data
       fetchRfqsAndCategories();
     } catch (err) {
       console.error('Failed to place B2B order:', err);
@@ -190,29 +189,29 @@ export default function BuyerDashboard() {
     switch (status) {
       case 'PENDING':
         return (
-          <span className="inline-flex items-center space-x-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200/50">
-            <Clock className="h-3 w-3" />
-            <span>Awaiting Quotes</span>
+          <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-500 bg-amber-50 dark:bg-amber-950/30 px-2.5 py-0.5 rounded-full">
+            <Clock className="h-2.5 w-2.5" />
+            <span>Awaiting Bids</span>
           </span>
         );
       case 'RESPONDED':
+        const offersCount = rfqs.find(r => r.status === 'RESPONDED')?.responses.length || 1;
         return (
-          <span className="inline-flex items-center space-x-1 rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 border border-indigo-200/50">
-            <Send className="h-3 w-3" />
-            <span>Offers Received ({rfqs.find(r => r.status === 'RESPONDED')?.responses.length || 1})</span>
+          <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-brand-primary bg-indigo-50 dark:bg-indigo-950/30 px-2.5 py-0.5 rounded-full">
+            <Send className="h-2.5 w-2.5" />
+            <span>{offersCount} Offers Received</span>
           </span>
         );
       case 'CLOSED':
         return (
-          <span className="inline-flex items-center space-x-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/50">
-            <CheckCircle2 className="h-3 w-3" />
-            <span>Quotation Closed</span>
+          <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-0.5 rounded-full">
+            <CheckCircle2 className="h-2.5 w-2.5" />
+            <span>Finalized</span>
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center space-x-1 rounded-full bg-zinc-50 px-2.5 py-1 text-xs font-semibold text-zinc-600 border border-zinc-200/50">
-            <HelpCircle className="h-3 w-3" />
+          <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 px-2.5 py-0.5 rounded-full">
             <span>{status}</span>
           </span>
         );
@@ -220,175 +219,196 @@ export default function BuyerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50 font-sans">
+    <div className="min-h-screen bg-[#fafafc] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-50 pt-24 selection:bg-brand-primary selection:text-white">
       <Header />
 
       <main className="mx-auto max-w-7xl px-6 py-12 sm:px-8">
-        {/* Portal Hero */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-10">
+        {/* High-level modern command deck topbar */}
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-12 gap-6">
           <div>
-            <h1 className="text-3xl font-black tracking-tight uppercase bg-gradient-to-r from-indigo-600 to-indigo-400 bg-clip-text text-transparent">B2B RFQ Procurement Portal</h1>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Submit high-volume industrial RFQs, receive side-by-side bids from verified sellers, and complete direct contracts.</p>
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-brand-primary bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-full mb-3">
+              <LayoutDashboard className="h-3 w-3" />
+              <span>Procurement Command</span>
+            </span>
+            <h1 className="font-hero text-3xl sm:text-4xl font-black tracking-tight text-zinc-950 dark:text-white">RFQ Workstation</h1>
+            <p className="text-[13px] font-medium text-zinc-500 dark:text-zinc-400 mt-1">Oversee enterprise Request-For-Quotes, conduct competitive matrix analyses, and activate manufacturer contracts.</p>
           </div>
           <button
+            id="btn-post-rfq"
             onClick={() => setShowRfqForm(true)}
-            className="mt-4 md:mt-0 inline-flex items-center space-x-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 py-3 px-5 text-sm font-bold text-white shadow-lg shadow-indigo-600/15 transition-all"
+            className="inline-flex items-center justify-center space-x-2 rounded-2xl bg-brand-primary hover:bg-indigo-600 py-3.5 px-7 text-sm font-black text-white shadow-lg shadow-indigo-600/15 transition-all active:scale-[0.98]"
           >
             <PlusCircle className="h-4 w-4" />
-            <span>Post New RFQ</span>
+            <span>Dispatch Global RFQ</span>
           </button>
         </div>
 
-        {/* Dashboard Cards Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="rounded-2xl bg-white p-6 shadow-sm border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 flex items-center space-x-4">
-            <div className="p-3.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl">
+        {/* Statistical capsule strip */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="rounded-[28px] bg-white border border-zinc-200/60 p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800/60 flex items-center space-x-5 group hover:shadow-md transition-all duration-300">
+            <div className="h-14 w-14 rounded-2xl bg-indigo-50 text-brand-primary dark:bg-indigo-950/40 dark:text-indigo-400 flex items-center justify-center shrink-0">
               <FileText className="h-6 w-6" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Total B2B RFQs</span>
-              <h3 className="text-3xl font-black mt-0.5">{rfqs.length}</h3>
+              <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Active Manifests</span>
+              <h3 className="font-hero text-3xl font-black text-zinc-950 dark:text-white mt-0.5">{rfqs.length}</h3>
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 flex items-center space-x-4">
-            <div className="p-3.5 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 rounded-xl">
+          <div className="rounded-[28px] bg-white border border-zinc-200/60 p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800/60 flex items-center space-x-5 group hover:shadow-md transition-all duration-300">
+            <div className="h-14 w-14 rounded-2xl bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 flex items-center justify-center shrink-0">
               <Clock className="h-6 w-6" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Awaiting Supplier Quotes</span>
-              <h3 className="text-3xl font-black mt-0.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Bidding Cycles</span>
+              <h3 className="font-hero text-3xl font-black text-zinc-950 dark:text-white mt-0.5">
                 {rfqs.filter((i) => i.status === 'PENDING').length}
               </h3>
             </div>
           </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 flex items-center space-x-4">
-            <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-xl">
+          <div className="rounded-[28px] bg-white border border-zinc-200/60 p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800/60 flex items-center space-x-5 group hover:shadow-md transition-all duration-300">
+            <div className="h-14 w-14 rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <CheckCircle2 className="h-6 w-6" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Closed Procurement Contracts</span>
-              <h3 className="text-3xl font-black mt-0.5">
+              <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Secured Nodes</span>
+              <h3 className="font-hero text-3xl font-black text-zinc-950 dark:text-white mt-0.5">
                 {rfqs.filter((i) => i.status === 'CLOSED').length}
               </h3>
             </div>
           </div>
         </div>
 
-        {/* Submitted Quotes list */}
-        <div className="rounded-2xl bg-white shadow-sm border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 overflow-hidden mb-20">
-          <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-            <h3 className="font-bold text-base uppercase tracking-wider">Active RFQ Procurement Pipeline</h3>
-            <span className="text-xs bg-zinc-100 dark:bg-zinc-800 py-1 px-3 rounded-full text-zinc-500 font-bold uppercase tracking-widest">Live Status</span>
+        {/* Advanced multi-stage procurement console container */}
+        <div className="rounded-[36px] bg-white border border-zinc-200/60 shadow-xl shadow-indigo-600/[0.01] dark:bg-zinc-900 dark:border-zinc-800/60 overflow-hidden mb-24">
+          <div className="px-8 py-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/30 dark:bg-zinc-850/10">
+            <div className="flex items-center gap-2">
+              <Activity className="h-4 w-4 text-brand-primary" />
+              <h3 className="font-hero text-[15px] font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Operational Log</h3>
+            </div>
+            <span className="text-[10px] font-black text-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1 rounded-full uppercase tracking-widest">Synchronized</span>
           </div>
 
           {loading ? (
-            <div className="py-20 flex items-center justify-center">
-              <div className="h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="py-32 flex items-center justify-center">
+              <div className="h-10 w-10 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : rfqs.length === 0 ? (
-            <div className="py-20 flex flex-col items-center text-zinc-400">
-              <FileText className="h-12 w-12 text-zinc-300 dark:text-zinc-800 mb-3" />
-              <p className="font-bold text-zinc-800 dark:text-zinc-200">No Request for Quotes Found</p>
-              <p className="text-xs mt-1 text-zinc-500 max-w-sm text-center">Post a new RFQ above to tell verified suppliers what products you need and receive bidding quotes.</p>
+            <div className="py-24 flex flex-col items-center text-center">
+              <div className="h-16 w-16 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center mb-6 text-zinc-300 dark:text-zinc-700 border border-zinc-100 dark:border-zinc-800">
+                <Layers className="h-7 w-7" />
+              </div>
+              <p className="font-hero text-lg font-black text-zinc-950 dark:text-white">Sourcing matrix is vacant</p>
+              <p className="text-xs mt-2 text-zinc-500 max-w-xs font-medium leading-relaxed">No procurement payloads discovered. Dispatch an RFQ to activate international factory bid networks.</p>
             </div>
           ) : (
             <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
               {rfqs.map((rfq, idx) => (
                 <motion.div
                   key={rfq.id}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: idx * 0.05 }}
-                  className="p-6 hover:bg-zinc-50/50 dark:hover:bg-zinc-950/10 transition-all"
+                  transition={{ duration: 0.4, delay: idx * 0.05 }}
+                  className="p-8 hover:bg-zinc-50/40 dark:hover:bg-zinc-850/10 transition-all"
                 >
-                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-                    <div className="flex items-start space-x-4 flex-1">
-                      <div className="p-3 bg-zinc-100 dark:bg-zinc-800/50 text-indigo-600 dark:text-indigo-400 rounded-xl shrink-0">
-                        <Package className="h-6 w-6" />
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                    <div className="flex items-start space-x-5 flex-1 min-w-0">
+                      <div className="h-14 w-14 rounded-2xl bg-zinc-50 border border-zinc-100 dark:bg-zinc-950 dark:border-zinc-850 flex items-center justify-center shrink-0">
+                        <Package className="h-6 w-6 text-zinc-400 dark:text-zinc-600" />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-3">
-                          <h4 className="font-bold text-lg text-zinc-900 dark:text-white leading-tight">{rfq.title}</h4>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <h4 className="font-hero text-lg font-bold text-zinc-950 dark:text-white line-clamp-1 leading-none">{rfq.title}</h4>
                           {getStatusBadge(rfq.status)}
                         </div>
-                        <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-semibold">
-                          <span className="bg-zinc-100 dark:bg-zinc-800/80 px-2 py-0.5 rounded-md">Category: {rfq.category.name}</span>
-                          <span>•</span>
-                          <span>Required Quantity: {rfq.quantity.toLocaleString()} units</span>
-                          <span>•</span>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2.5 text-[11px] text-zinc-400 font-bold uppercase tracking-wider">
+                          <span className="text-brand-primary font-black">{rfq.category.name}</span>
+                          <div className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+                          <span>{rfq.quantity.toLocaleString()} units</span>
                           {rfq.targetPrice && (
                             <>
-                              <span>Target Price: ₹{rfq.targetPrice.toLocaleString()}/unit</span>
-                              <span>•</span>
+                              <div className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+                              <span>Tgt: ₹{rfq.targetPrice.toLocaleString()}</span>
                             </>
                           )}
-                          <span>Submitted: {new Date(rfq.createdAt).toLocaleDateString()}</span>
+                          <div className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+                          <span>Logged: {new Date(rfq.createdAt).toLocaleDateString()}</span>
                         </div>
-                        <p className="text-xs text-zinc-400 mt-2.5 max-w-2xl bg-zinc-50 dark:bg-zinc-950/40 p-3 rounded-xl border border-zinc-200/30 dark:border-zinc-800/30">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-4 font-medium leading-relaxed bg-zinc-50/50 dark:bg-zinc-950/20 border border-zinc-200/30 dark:border-zinc-800/30 p-4 rounded-2xl max-w-4xl">
                           {rfq.description}
                         </p>
                       </div>
                     </div>
 
-                    <div className="shrink-0 flex flex-col md:items-end justify-center">
-                      <span className="text-[10px] text-zinc-400 font-black tracking-widest uppercase mb-1">RFQ ID: #{rfq.id.slice(0, 8)}</span>
+                    <div className="shrink-0 flex lg:flex-col items-end justify-center">
+                      <span className="font-mono text-[10px] text-zinc-400 tracking-widest bg-zinc-50 border border-zinc-100 dark:bg-zinc-800 dark:border-zinc-750 px-2.5 py-1 rounded-lg font-black">
+                        #{rfq.id.slice(0, 8).toUpperCase()}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Seller Responses comparison section */}
+                  {/* Matrix list of incoming responses for this node */}
                   {rfq.responses && rfq.responses.length > 0 && (
-                    <div className="mt-6 border-t border-zinc-100 dark:border-zinc-800 pt-5">
-                      <h5 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3 flex items-center gap-2">
-                        <TrendingUp className="h-3.5 w-3.5 text-indigo-500" />
-                        <span>Supplier Pricing Offers ({rfq.responses.length})</span>
-                      </h5>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="mt-8 pt-7 border-t border-dashed border-zinc-200 dark:border-zinc-800">
+                      <div className="flex items-center gap-2 mb-5">
+                        <TrendingUp className="h-4 w-4 text-brand-primary" />
+                        <h5 className="font-hero text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                          Supplier Bidding Proposals ({rfq.responses.length})
+                        </h5>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         {rfq.responses.map((quote) => (
                           <div
                             key={quote.id}
-                            className={`rounded-2xl border p-4 transition-all relative overflow-hidden flex flex-col justify-between ${
+                            className={`group rounded-3xl border p-5 transition-all flex flex-col justify-between relative overflow-hidden ${
                               quote.status === 'ACCEPTED'
-                                ? 'bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/10 dark:border-emerald-900/30'
-                                : 'bg-white border-zinc-100 hover:border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800/40'
+                                ? 'bg-emerald-50/40 border-emerald-200/60 dark:bg-emerald-950/10 dark:border-emerald-900/40 shadow-lg shadow-emerald-600/[0.02]'
+                                : 'bg-white border-zinc-200/60 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-600/[0.01] dark:bg-zinc-900 dark:border-zinc-800/60'
                             }`}
                           >
                             <div>
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="font-extrabold text-sm text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
-                                  <User className="h-4 w-4 text-indigo-500" />
-                                  <span>{quote.seller.profile?.companyName || quote.seller.name}</span>
+                              <div className="flex items-center justify-between gap-3 mb-3">
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <div className="h-6 w-6 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0 text-zinc-400 group-hover:bg-indigo-50 group-hover:text-brand-primary transition-colors">
+                                    <User className="h-3 w-3" />
+                                  </div>
+                                  <span className="font-hero text-[13px] font-bold text-zinc-950 dark:text-white truncate">
+                                    {quote.seller.profile?.companyName || quote.seller.name}
+                                  </span>
                                   {quote.seller.profile?.isVerified && (
-                                    <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
                                   )}
-                                </span>
-                                <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">
+                                </div>
+                                <span className="font-black text-sm text-brand-primary dark:text-indigo-400 shrink-0">
                                   ₹{quote.priceQuote.toLocaleString()}/unit
                                 </span>
                               </div>
-                              <p className="text-xs text-zinc-500 mb-3">&quot;{quote.notes || 'No extra supplier notes provided.'}&quot;</p>
+                              <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium italic mb-5 line-clamp-2">
+                                &ldquo;{quote.notes || 'No additional annotations.'}&rdquo;
+                              </p>
                             </div>
-                            <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800 pt-3">
-                              <span className="text-xs text-zinc-400 font-bold flex items-center gap-1">
+
+                            <div className="flex items-center justify-between pt-4 border-t border-zinc-100 dark:border-zinc-800 mt-auto">
+                              <div className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-400">
                                 <Truck className="h-3.5 w-3.5" />
-                                <span>Est. Delivery: {quote.leadTimeDays} days</span>
-                              </span>
+                                <span>{quote.leadTimeDays} days SLA</span>
+                              </div>
                               {rfq.status !== 'CLOSED' ? (
                                 <button
                                   onClick={() => handleSelectQuote(quote, rfq)}
-                                  className="text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white py-1.5 px-3 rounded-lg shadow-sm shadow-indigo-600/10 transition-all flex items-center gap-1"
+                                  className="text-[11px] font-black uppercase tracking-wider bg-brand-primary hover:bg-indigo-600 text-white py-2 px-4 rounded-xl shadow-md shadow-indigo-600/10 transition-all flex items-center gap-1.5 active:scale-95"
                                 >
-                                  <span>Accept & Order</span>
-                                  <ArrowRight className="h-3.5 w-3.5" />
+                                  <span>Secure Bid</span>
+                                  <ArrowRight className="h-3 w-3" />
                                 </button>
                               ) : quote.status === 'ACCEPTED' ? (
-                                <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600">
-                                  <Check className="h-4 w-4" />
-                                  <span>Accepted Offer</span>
+                                <span className="inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider text-emerald-600">
+                                  <Check className="h-3.5 w-3.5" />
+                                  <span>Accepted Node</span>
                                 </span>
                               ) : (
-                                <span className="text-xs font-bold text-zinc-400">Ignored</span>
+                                <span className="text-[10px] font-black uppercase tracking-wider text-zinc-300 dark:text-zinc-700">Dormant</span>
                               )}
                             </div>
                           </div>
@@ -403,7 +423,7 @@ export default function BuyerDashboard() {
         </div>
       </main>
 
-      {/* Post New RFQ Form Modal */}
+      {/* Multi-step Post New RFQ Slide Overlay */}
       <AnimatePresence>
         {showRfqForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -418,34 +438,37 @@ export default function BuyerDashboard() {
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 overflow-hidden"
+              className="relative w-full max-w-xl rounded-[36px] bg-white p-8 shadow-2xl border border-zinc-200/60 dark:bg-zinc-900 dark:border-zinc-800/60 overflow-hidden z-10"
             >
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="font-extrabold text-lg uppercase tracking-wider">Post Industrial RFQ</h3>
-                <button onClick={() => setShowRfqForm(false)} className="p-1 text-zinc-400 hover:text-zinc-600">
-                  <X className="h-5 w-5" />
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-100 dark:border-zinc-800">
+                <div className="flex items-center gap-2">
+                  <PlusCircle className="h-5 w-5 text-brand-primary" />
+                  <h3 className="font-hero text-lg font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Dispatch RFQ Manifest</h3>
+                </div>
+                <button onClick={() => setShowRfqForm(false)} className="h-8 w-8 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 transition-colors">
+                  <X className="h-4 w-4" />
                 </button>
               </div>
 
-              <form onSubmit={handleCreateRfq} className="space-y-4">
+              <form onSubmit={handleCreateRfq} className="space-y-5">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Product/Service Name</label>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Contract / SKU Identifier</label>
                   <input
                     type="text"
                     required
                     value={formTitle}
                     onChange={(e) => setFormTitle(e.target.value)}
-                    placeholder="e.g. Bulk Nitrile Protective Gloves"
-                    className="w-full rounded-xl border border-zinc-200 bg-transparent py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    placeholder="e.g. 500x 2.5in SATA Enterprise Solid State Drives"
+                    className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none transition-all focus:border-brand-primary dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">procurement Category</label>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Procurement Category Channel</label>
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value)}
-                    className="w-full rounded-xl border border-zinc-200 bg-transparent py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-bold text-zinc-950 outline-none focus:border-brand-primary dark:border-zinc-700 dark:bg-zinc-800 dark:text-white cursor-pointer"
                   >
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
@@ -455,51 +478,51 @@ export default function BuyerDashboard() {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Required Quantity</label>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Bulk Allocation Volume</label>
                     <input
                       type="number"
                       required
                       min={1}
                       value={formQty}
                       onChange={(e) => setFormQty(parseInt(e.target.value))}
-                      className="w-full rounded-xl border border-zinc-200 bg-transparent py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none focus:border-brand-primary dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Target Price per unit (Optional)</label>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Target Unit Quote (INR)</label>
                     <input
                       type="number"
-                      placeholder="e.g. 150"
+                      placeholder="e.g. 4500"
                       value={formPrice}
                       onChange={(e) => setFormPrice(e.target.value)}
-                      className="w-full rounded-xl border border-zinc-200 bg-transparent py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                      className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none focus:border-brand-primary dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Detailed Specifications</label>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Detailed Payload Specifications</label>
                   <textarea
                     required
                     rows={3}
                     value={formDesc}
                     onChange={(e) => setFormDesc(e.target.value)}
-                    placeholder="Describe material requirements, certifications (e.g. ISO), dimensions, and usage."
-                    className="w-full rounded-xl border border-zinc-200 bg-transparent py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    placeholder="Enter industrial technical data sheets, OEM certifications, and special packaging demands..."
+                    className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none transition-all focus:border-brand-primary dark:border-zinc-700 dark:bg-zinc-800 dark:text-white resize-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={formSubmitting}
-                  className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-500 py-3 text-sm font-bold text-white transition-all shadow-md mt-2 flex items-center justify-center"
+                  className="w-full rounded-2xl bg-brand-primary hover:bg-indigo-600 py-4 text-[14px] font-black text-white transition-all shadow-lg shadow-indigo-600/15 flex items-center justify-center mt-2 active:scale-[0.99]"
                 >
                   {formSubmitting ? (
                     <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   ) : (
-                    <span>Submit RFQ to Suppliers</span>
+                    <span>Broadcast to Global Factory Mesh</span>
                   )}
                 </button>
               </form>
@@ -508,7 +531,7 @@ export default function BuyerDashboard() {
         )}
       </AnimatePresence>
 
-      {/* Checkout/Order Confirmation Overlay */}
+      {/* Order Confirmation Overlay */}
       <AnimatePresence>
         {checkoutResponse && checkoutRfq && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -526,74 +549,81 @@ export default function BuyerDashboard() {
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 overflow-hidden"
+              className="relative w-full max-w-lg rounded-[36px] bg-white p-8 shadow-2xl border border-zinc-200/60 dark:bg-zinc-900 dark:border-zinc-800/60 overflow-hidden z-10"
             >
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="font-extrabold text-lg uppercase tracking-wider">Confirm B2B Procurement Contract</h3>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-brand-primary" />
+                  <h3 className="font-hero text-lg font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Execute Contract Node</h3>
+                </div>
                 <button
                   onClick={() => {
                     setCheckoutRfq(null);
                     setCheckoutResponse(null);
                   }}
-                  className="p-1 text-zinc-400 hover:text-zinc-600"
+                  className="h-8 w-8 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 transition-colors"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
 
-              <div className="bg-zinc-50 dark:bg-zinc-950/50 p-4 rounded-xl border border-zinc-200/30 mb-5">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs text-zinc-400 font-bold uppercase">Product / RFQ</span>
-                  <span className="text-xs font-black text-indigo-600">ID: #{checkoutRfq.id.slice(0, 8)}</span>
+              <div className="bg-zinc-50 border border-zinc-200/60 dark:bg-zinc-950/40 dark:border-zinc-800/50 p-5 rounded-2xl mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[9px] text-zinc-400 font-black uppercase tracking-widest">Secured Transaction Object</span>
+                  <span className="font-mono text-[10px] font-black text-brand-primary uppercase">#{checkoutRfq.id.slice(0, 8)}</span>
                 </div>
-                <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-200">{checkoutRfq.title}</h4>
-                <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-zinc-200/30">
+                <h4 className="font-hero text-sm font-bold text-zinc-950 dark:text-white mb-4 border-b border-zinc-200/40 pb-2">{checkoutRfq.title}</h4>
+                
+                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                   <div>
-                    <span className="block text-[10px] text-zinc-400 font-bold uppercase">Contracted Supplier</span>
-                    <span className="font-bold text-xs text-zinc-800 dark:text-zinc-200">{checkoutResponse.seller.name}</span>
+                    <span className="block text-[9px] text-zinc-400 font-black uppercase tracking-widest mb-0.5">Assigned OEM</span>
+                    <span className="font-bold text-xs text-zinc-950 dark:text-white line-clamp-1">{checkoutResponse.seller.name}</span>
                   </div>
                   <div>
-                    <span className="block text-[10px] text-zinc-400 font-bold uppercase">Agreed Rate</span>
-                    <span className="font-bold text-xs text-indigo-600">₹{checkoutResponse.priceQuote.toLocaleString()}/unit</span>
+                    <span className="block text-[9px] text-zinc-400 font-black uppercase tracking-widest mb-0.5">Contract Unit Rate</span>
+                    <span className="font-bold text-xs text-zinc-950 dark:text-white">₹{checkoutResponse.priceQuote.toLocaleString()}</span>
                   </div>
                   <div>
-                    <span className="block text-[10px] text-zinc-400 font-bold uppercase">Procurement Volume</span>
-                    <span className="font-bold text-xs text-zinc-800 dark:text-zinc-200">{checkoutRfq.quantity} units</span>
+                    <span className="block text-[9px] text-zinc-400 font-black uppercase tracking-widest mb-0.5">Contract Mass</span>
+                    <span className="font-bold text-xs text-zinc-950 dark:text-white">{checkoutRfq.quantity} Units</span>
                   </div>
                   <div>
-                    <span className="block text-[10px] text-zinc-400 font-bold uppercase">Contract Value</span>
-                    <span className="font-extrabold text-xs text-indigo-600">₹{(checkoutResponse.priceQuote * checkoutRfq.quantity).toLocaleString()}</span>
+                    <span className="block text-[9px] text-zinc-400 font-black uppercase tracking-widest mb-0.5">Aggregate Cost</span>
+                    <span className="font-black text-xs text-brand-primary">₹{(checkoutResponse.priceQuote * checkoutRfq.quantity).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
 
-              <form onSubmit={handlePlaceOrder} className="space-y-4">
+              <form onSubmit={handlePlaceOrder} className="space-y-5">
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 uppercase mb-1">Enterprise Shipping Address</label>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1 flex items-center gap-1.5">
+                    <Truck className="h-3.5 w-3.5 text-brand-primary" />
+                    <span>Enterprise Gateway Shipping Address</span>
+                  </label>
                   <input
                     type="text"
                     required
                     value={checkoutShipping}
                     onChange={(e) => setCheckoutShipping(e.target.value)}
-                    placeholder="e.g. Block C, Sector 62, Noida, UP - 201301"
-                    className="w-full rounded-xl border border-zinc-200 bg-transparent py-2.5 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    placeholder="e.g. Terminal B, Warehouse 4, TATAmart Node, Pune, IN"
+                    className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none focus:border-brand-primary dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   />
                 </div>
 
-                <div className="flex items-center gap-2.5 text-xs text-zinc-400 bg-amber-50/50 dark:bg-amber-950/10 p-3.5 rounded-xl border border-amber-200/30">
-                  <AlertCircle className="h-4 w-4 text-amber-500 shrink-0" />
-                  <span>By placing this order, you authorize the dynamic stock allocation and close the procurement bid on this RFQ.</span>
+                <div className="flex items-start gap-2.5 text-[11px] text-amber-600 dark:text-amber-400 bg-amber-50/40 dark:bg-amber-950/20 p-4 rounded-xl border border-amber-200/20">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <span className="font-medium leading-normal">Signing this allocation pipeline executes a contract binding agreement, locking unit rates and closing standard bidding cycles for other vendors.</span>
                 </div>
 
                 <button
                   type="submit"
                   disabled={checkoutSubmitting}
-                  className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-500 py-3 text-sm font-bold text-white transition-all shadow-md flex items-center justify-center mt-2"
+                  className="w-full rounded-2xl bg-brand-primary hover:bg-indigo-600 py-4 text-[14px] font-black text-white transition-all shadow-lg shadow-indigo-600/15 flex items-center justify-center mt-2 active:scale-[0.99]"
                 >
                   {checkoutSubmitting ? (
                     <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   ) : (
-                    <span>Sign & Place Order</span>
+                    <span>Cryptographically Secure & Order</span>
                   )}
                 </button>
               </form>
@@ -602,7 +632,7 @@ export default function BuyerDashboard() {
         )}
       </AnimatePresence>
 
-      {/* Success Popup Modal */}
+      {/* Large Premium Confirmation Success Overlay */}
       <AnimatePresence>
         {successModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -617,33 +647,34 @@ export default function BuyerDashboard() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative w-full max-w-sm rounded-3xl bg-white p-8 shadow-2xl border border-zinc-200/40 dark:bg-zinc-900 dark:border-zinc-800/40 text-center overflow-hidden"
+              className="relative w-full max-w-md rounded-[40px] bg-white p-10 shadow-2xl border border-zinc-200/60 dark:bg-zinc-900 dark:border-zinc-800/60 text-center overflow-hidden z-10"
             >
-              <div className="mx-auto h-20 w-20 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-500 dark:text-emerald-400 flex items-center justify-center mb-6 border border-emerald-100">
+              <div className="mx-auto h-20 w-20 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-500 dark:text-emerald-400 flex items-center justify-center mb-6 border border-emerald-100 dark:border-emerald-900/30 relative">
+                <div className="absolute inset-0 bg-emerald-500/10 animate-ping rounded-full pointer-events-none"></div>
                 <motion.div
-                  initial={{ scale: 0.5, rotate: -45 }}
+                  initial={{ scale: 0.5, rotate: -30 }}
                   animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
+                  transition={{ type: 'spring', stiffness: 200, delay: 0.15 }}
                 >
-                  <ShoppingBag className="h-10 w-10" />
+                  <ShoppingBag className="h-9 w-9 relative z-10" />
                 </motion.div>
               </div>
 
-              <h3 className="text-2xl font-black uppercase tracking-tight text-zinc-900 dark:text-white">Order Placed!</h3>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">
-                Your B2B procurement contract has been signed successfully. The supplier is preparing shipment allocations.
+              <h3 className="font-hero text-2xl font-black text-zinc-950 dark:text-white mb-3">Allocation Dispatched</h3>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed max-w-xs mx-auto">
+                Your multi-party transaction has successfully passed authentication nodes. High-volume manufacturer logs are active.
               </p>
 
-              <div className="bg-zinc-50 dark:bg-zinc-950/40 p-3 rounded-2xl border border-zinc-200/20 text-xs font-bold text-zinc-400 mt-5 flex items-center justify-center gap-1.5">
+              <div className="bg-zinc-50 border border-zinc-200/40 dark:bg-zinc-950/30 dark:border-zinc-800/50 p-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-zinc-400 mt-7 flex items-center justify-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                <span>Enterprise transaction fully verified</span>
+                <span>Dynamic Ledger Authenticated</span>
               </div>
 
               <button
                 onClick={() => setSuccessModal(false)}
-                className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-500 py-3 text-sm font-bold text-white transition-all shadow-md mt-6"
+                className="w-full rounded-2xl bg-brand-primary hover:bg-indigo-600 py-4 text-[13px] font-black text-white shadow-lg shadow-indigo-600/15 transition-all mt-8 active:scale-[0.99]"
               >
-                Continue Pipeline Tracking
+                Return to Workstation Console
               </button>
             </motion.div>
           </div>
@@ -652,3 +683,4 @@ export default function BuyerDashboard() {
     </div>
   );
 }
+

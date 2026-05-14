@@ -31,17 +31,14 @@ class DashboardController extends Controller
         $recentInquiries = Inquiry::where('seller_id', $userId)->with('buyer')->latest()->take(5)->get();
         $totalQuotesSent = RfqResponse::where('seller_id', $userId)->count();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'total_products' => $totalProducts,
-                'total_revenue' => round($totalRevenue, 2),
-                'pending_orders' => $pendingOrders,
-                'total_inquiries' => $totalInquiries,
-                'quotes_sent' => $totalQuotesSent,
-                'recent_inquiries' => $recentInquiries
-            ]
-        ]);
+        return $this->successResponse([
+            'total_products' => $totalProducts,
+            'total_revenue' => round($totalRevenue, 2),
+            'pending_orders' => $pendingOrders,
+            'total_inquiries' => $totalInquiries,
+            'quotes_sent' => $totalQuotesSent,
+            'recent_inquiries' => $recentInquiries
+        ], 'Seller stats retrieved successfully');
     }
 
     public function buyerStats()
@@ -59,15 +56,12 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'total_rfqs' => $totalRfqs,
-                'total_spent' => round($totalSpent, 2),
-                'recent_orders' => $recentOrders,
-                'inquiries_sent' => Inquiry::where('buyer_id', $userId)->count(),
-            ]
-        ]);
+        return $this->successResponse([
+            'total_rfqs' => $totalRfqs,
+            'total_spent' => round($totalSpent, 2),
+            'recent_orders' => $recentOrders,
+            'inquiries_sent' => Inquiry::where('buyer_id', $userId)->count(),
+        ], 'Buyer stats retrieved successfully');
     }
 
     public function sellerAnalytics()
@@ -77,39 +71,36 @@ class DashboardController extends Controller
         $totalLeads = Rfq::where('status', 'open')->count();
         $quotesSent = RfqResponse::where('seller_id', $userId)->count();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'totalLeads' => $totalLeads,
-                'responseRate' => $totalLeads > 0 ? round(($quotesSent / $totalLeads) * 100) : 0,
-                'statusCounts' => [
-                    'PENDING' => Rfq::where('status', 'open')->count(),
-                    'REPLIED' => (clone $rfqs)->count(),
-                    'CLOSED' => Rfq::where('status', 'closed')->count(),
-                ],
-                'topProducts' => Product::where('seller_id', $userId)
-                    ->withCount('images')
-                    ->latest()
-                    ->take(5)
-                    ->get()
-                    ->map(fn ($product) => [
-                        'id' => (string) $product->id,
-                        'title' => $product->name,
-                        'inquiries_count' => Inquiry::where('product_id', $product->id)->count(),
-                    ]),
-                'monthlyLeads' => [],
+        return $this->successResponse([
+            'totalLeads' => $totalLeads,
+            'responseRate' => $totalLeads > 0 ? round(($quotesSent / $totalLeads) * 100) : 0,
+            'statusCounts' => [
+                'PENDING' => Rfq::where('status', 'open')->count(),
+                'REPLIED' => (clone $rfqs)->count(),
+                'CLOSED' => Rfq::where('status', 'closed')->count(),
             ],
-        ]);
+            'topProducts' => Product::where('seller_id', $userId)
+                ->withCount('images')
+                ->latest()
+                ->take(5)
+                ->get()
+                ->map(fn ($product) => [
+                    'id' => (string) $product->id,
+                    'title' => $product->name,
+                    'inquiries_count' => Inquiry::where('product_id', $product->id)->count(),
+                ]),
+            'monthlyLeads' => [],
+        ], 'Seller analytics retrieved successfully');
     }
 
     public function adminStats()
     {
-        return response()->json([
+        return $this->successResponse([
             'totalUsers' => User::count(),
             'totalProducts' => Product::count(),
             'totalInquiries' => Inquiry::count(),
             'totalOrders' => Order::count(),
-        ]);
+        ], 'Admin stats retrieved successfully');
     }
 
     public function adminUsers()
@@ -132,7 +123,7 @@ class DashboardController extends Controller
             ];
         });
 
-        return response()->json($users);
+        return $this->successResponse($users, 'Admin users retrieved successfully');
     }
 
     public function adminProducts()
@@ -148,7 +139,7 @@ class DashboardController extends Controller
             ],
         ]);
 
-        return response()->json($products);
+        return $this->successResponse($products, 'Admin products retrieved successfully');
     }
 
     public function toggleUserVerification(Request $request, int $id)
@@ -156,15 +147,12 @@ class DashboardController extends Controller
         $user = User::with('sellerProfile')->findOrFail($id);
 
         if (! $user->sellerProfile) {
-            return response()->json(['message' => 'Seller profile not found'], 404);
+            return $this->errorResponse('Seller profile not found', 404);
         }
 
         $request->validate(['isVerified' => 'required|boolean']);
         $user->sellerProfile->update(['is_verified' => $request->boolean('isVerified')]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Verification status updated',
-        ]);
+        return $this->successResponse([], 'Verification status updated');
     }
 }

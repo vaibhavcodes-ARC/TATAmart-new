@@ -22,21 +22,13 @@ class AuthController extends Controller
             'role' => strtolower($request->role ?? ''),
         ]);
 
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
             'role' => 'required|in:buyer,seller',
             'company_name' => 'nullable|string|max:255',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation error',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
 
         $user = User::create([
             'name' => $request->name,
@@ -61,22 +53,17 @@ class AuthController extends Controller
         try {
             $token = JWTAuth::fromUser($user);
         } catch (Throwable $exception) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Authentication service is not configured. Please set JWT_SECRET.',
-            ], 500);
+            return $this->errorResponse('Authentication service is not configured. Please set JWT_SECRET.', 500);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'User created successfully',
+        return $this->successResponse([
             'user' => $user,
             'token' => $token,
             'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',
             ]
-        ]);
+        ], 'User created successfully');
     }
 
     public function login(Request $request)
@@ -91,44 +78,33 @@ class AuthController extends Controller
         try {
             $token = Auth::attempt($credentials);
         } catch (Throwable $exception) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Authentication service is unavailable. Please verify JWT_SECRET and database connectivity.',
-            ], 500);
+            return $this->errorResponse('Authentication service is unavailable. Please verify JWT_SECRET and database connectivity.', 500);
         }
+        
         if (!$token) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid credentials',
-            ], 401);
+            return $this->errorResponse('Invalid credentials', 401);
         }
 
         $user = Auth::user();
         if (! $user->is_active) {
             Auth::logout();
-            return response()->json([
-                'status' => 'error',
-                'message' => 'This account is disabled. Please contact support.',
-            ], 403);
+            return $this->errorResponse('This account is disabled. Please contact support.', 403);
         }
-        return response()->json([
-            'status' => 'success',
+        
+        return $this->successResponse([
             'user' => $user,
             'token' => $token,
             'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',
             ]
-        ]);
+        ], 'Successfully logged in');
     }
 
     public function logout()
     {
         Auth::logout();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Successfully logged out',
-        ]);
+        return $this->successResponse([], 'Successfully logged out');
     }
 
     public function me()
@@ -139,21 +115,19 @@ class AuthController extends Controller
         } else if ($user->role === 'buyer') {
             $user->load('buyerProfile');
         }
-        return response()->json([
-            'status' => 'success',
+        return $this->successResponse([
             'user' => $user,
-        ]);
+        ], 'User retrieved successfully');
     }
 
     public function refresh()
     {
-        return response()->json([
-            'status' => 'success',
+        return $this->successResponse([
             'user' => Auth::user(),
             'authorization' => [
                 'token' => JWTAuth::refresh(),
                 'type' => 'bearer',
             ]
-        ]);
+        ], 'Token refreshed successfully');
     }
 }

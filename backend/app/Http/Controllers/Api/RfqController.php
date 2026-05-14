@@ -19,7 +19,7 @@ class RfqController extends Controller
             ->get()
             ->map(fn ($rfq) => $this->formatRfq($rfq));
 
-        return response()->json($rfqs);
+        return $this->successResponse($rfqs);
     }
 
     // Public board for Sellers to browse open RFQs
@@ -33,7 +33,7 @@ class RfqController extends Controller
             ->get()
             ->map(fn ($rfq) => $this->formatRfq($rfq));
 
-        return response()->json($rfqs);
+        return $this->successResponse($rfqs);
     }
 
     public function store(Request $request)
@@ -64,11 +64,7 @@ class RfqController extends Controller
             'status' => 'open'
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'RFQ created successfully',
-            'data' => $rfq
-        ]);
+        return $this->successResponse($rfq, 'RFQ created successfully');
     }
 
     // Seller responding to RFQ
@@ -92,11 +88,7 @@ class RfqController extends Controller
             'status' => 'pending'
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Quote submitted to buyer',
-            'data' => $response
-        ]);
+        return $this->successResponse($response, 'Quote submitted to buyer');
     }
 
     public function respondFromBody(Request $request)
@@ -113,18 +105,14 @@ class RfqController extends Controller
         $response = RfqResponse::with('rfq')->findOrFail($id);
 
         if ($response->rfq->buyer_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return $this->errorResponse('Unauthorized', 403);
         }
 
         RfqResponse::where('rfq_id', $response->rfq_id)->update(['status' => 'rejected']);
         $response->update(['status' => 'accepted']);
         $response->rfq->update(['status' => 'closed']);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Quotation accepted successfully',
-            'data' => $this->formatRfq($response->rfq->fresh(['category', 'responses.seller.sellerProfile'])),
-        ]);
+        return $this->successResponse($this->formatRfq($response->rfq->fresh(['category', 'responses.seller.sellerProfile'])), 'Quotation accepted successfully');
     }
 
     private function formatRfq(Rfq $rfq): array

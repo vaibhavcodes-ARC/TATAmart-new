@@ -38,10 +38,7 @@ class ProductController extends Controller
 
         $products = $query->orderBy('created_at', 'desc')->paginate(12);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $products
-        ]);
+        return $this->successResponse($products);
     }
 
     public function show($slug)
@@ -50,10 +47,7 @@ class ProductController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $product
-        ]);
+        return $this->successResponse($product);
     }
 
     // Seller action
@@ -113,20 +107,13 @@ class ProductController extends Controller
             ]);
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Product added successfully',
-            'data' => $product
-        ], 201);
+        return $this->successResponse($product, 'Product added successfully', 201);
     }
 
     public function myProducts()
     {
         $products = Product::where('seller_id', Auth::id())->with('primaryImage')->get();
-        return response()->json([
-            'status' => 'success',
-            'data' => $products
-        ]);
+        return $this->successResponse($products);
     }
 
     public function update(Request $request, int $id)
@@ -149,11 +136,7 @@ class ProductController extends Controller
 
         $product->update($payload);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Product updated successfully',
-            'data' => $product->fresh(['category', 'primaryImage']),
-        ]);
+        return $this->successResponse($product->fresh(['category', 'primaryImage']), 'Product updated successfully');
     }
 
     public function destroy(int $id)
@@ -166,10 +149,7 @@ class ProductController extends Controller
         $product = $query->findOrFail($id);
         $product->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Product removed successfully',
-        ]);
+        return $this->successResponse([], 'Product removed successfully');
     }
 
     public function inquire(Request $request)
@@ -194,10 +174,6 @@ class ProductController extends Controller
             'quantity' => $request->quantity,
         ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Inquiry sent successfully',
-            'data' => $inquiry,
-        ], 201);
+        return $this->successResponse($inquiry, 'Inquiry sent successfully', 201);
     }
 }

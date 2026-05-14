@@ -35,7 +35,7 @@ class OrderController extends Controller
                 'createdAt' => optional($order->created_at)->toIso8601String(),
             ]);
 
-        return response()->json($orders);
+        return $this->successResponse($orders, 'Orders retrieved successfully');
     }
 
     /**
@@ -53,17 +53,9 @@ class OrderController extends Controller
                 $request->only('shippingAdd')
             );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Order placed successfully',
-                'data' => $order
-            ], 201);
-
+            return $this->successResponse($order, 'Order placed successfully', 201);
         } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 422);
+            return $this->errorResponse($e->getMessage(), 422);
         }
     }
 }

@@ -1,11 +1,14 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --font-hero: "Space Grotesk", "Inter", system-ui, sans-serif;
-  --font-inter: "Inter", system-ui, sans-serif;
-  --font-sans: "DM Sans", "Inter", system-ui, sans-serif;
+  --background: #fcfcfd;
+  --foreground: #18181b;
+  --brand-primary: #5c3eb8;
+  --brand-secondary: #4f46e5;
+  --font-hero: var(--font-heading);
+  --font-inter: var(--font-sans);
   --font-monoenterprise: "IBM Plex Sans", "Inter", system-ui, sans-serif;
   --font-footer: "Manrope", "Inter", system-ui, sans-serif;
 }
@@ -13,22 +16,76 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-hero: var(--font-hero);
-  --font-sans: var(--font-sans);
-  --font-inter: var(--font-inter);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --font-heading: var(--font-plus-jakarta), sans-serif;
+  --font-sans: var(--font-space-grotesk), sans-serif;
+  --font-hero: var(--font-plus-jakarta), sans-serif;
+  --font-inter: var(--font-space-grotesk), sans-serif;
   --font-monoenterprise: var(--font-monoenterprise);
   --font-footer: var(--font-footer);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --background: #09090b;
+  --foreground: #fafafa;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
 }
+
+h1, h2, h3, h4, h5, h6, .font-heading, .font-hero {
+  font-family: var(--font-heading);
+}
+
+/* Modern premium scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e4e4e7;
+  border-radius: 100px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #27272a;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4d4d8;
+}
+
+/* Infinite marquee utility keyframes */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-infinite-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+.animate-infinite-marquee:hover {
+  animation-play-state: paused;
+}
+

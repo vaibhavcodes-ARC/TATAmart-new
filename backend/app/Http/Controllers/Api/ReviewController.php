@@ -34,19 +34,13 @@ class ReviewController extends Controller
             ->exists();
 
         if (!$hasPurchased) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Verification Failed: You must formally purchase this product before drafting a public review.'
-            ], 403);
+            return $this->errorResponse('Verification Failed: You must formally purchase this product before drafting a public review.', 403);
         }
 
         // Prevent duplicate review submission
         $existing = Review::where('user_id', $userId)->where('product_id', $productId)->exists();
         if ($existing) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You have already provided feedback for this product.'
-            ], 422);
+            return $this->errorResponse('You have already provided feedback for this product.', 422);
         }
 
         $product = Product::findOrFail($productId);
@@ -59,10 +53,6 @@ class ReviewController extends Controller
             'comment' => $request->input('comment'),
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Review published successfully to verification pool.',
-            'data' => $review->load('user')
-        ], 201);
+        return $this->successResponse($review->load('user'), 'Review published successfully to verification pool.', 201);
     }
 }

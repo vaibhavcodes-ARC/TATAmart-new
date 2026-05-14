@@ -14,27 +14,37 @@ class CategorySeeder extends Seeder
             [
                 'name' => 'Industrial Machinery',
                 'is_featured' => true,
-                'children' => ['Heavy Duty Equipment', 'CNC Machines', 'Generators']
+                'children' => ['CNC Machines', 'Hydraulic Presses', 'Air Compressors']
             ],
             [
                 'name' => 'Electronics & Electrical',
                 'is_featured' => true,
-                'children' => ['Power Inverters', 'Cables & Wires', 'Industrial Batteries']
+                'children' => ['PLC Controllers', 'Circuit Breakers', 'Sensors']
+            ],
+            [
+                'name' => 'Automotive Components',
+                'is_featured' => true,
+                'children' => ['Gears', 'Bearings', 'Brakes']
+            ],
+            [
+                'name' => 'Steel & Raw Materials',
+                'is_featured' => true,
+                'children' => ['Steel Coils', 'Stainless Sheets', 'Copper Wires']
+            ],
+            [
+                'name' => 'Chemicals & Supplies',
+                'is_featured' => false,
+                'children' => ['Industrial Grease', 'Solvents']
             ],
             [
                 'name' => 'Construction & Real Estate',
                 'is_featured' => true,
-                'children' => ['Cement & Concrete', 'TMT Bars', 'Paint & Wall Covering']
+                'children' => ['Cement & Concrete', 'H-Beams', 'Rebars']
             ],
             [
-                'name' => 'Packaging & Paper',
-                'is_featured' => false,
-                'children' => ['Corrugated Boxes', 'Packaging Tape', 'Wrappings']
-            ],
-            [
-                'name' => 'Apparel, Clothing & Accessories',
-                'is_featured' => false,
-                'children' => ['Mens Wear', 'Workwear', 'Fabrics']
+                'name' => 'IT & Enterprise Hardware',
+                'is_featured' => true,
+                'children' => ['Enterprise Servers', 'AI Edge Gateways', 'Spine Switches']
             ]
         ];
 

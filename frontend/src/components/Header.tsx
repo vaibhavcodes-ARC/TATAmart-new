@@ -1,158 +1,103 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { api } from '../utils/api';
-import { User as UserIcon, LogOut, ArrowRight, Menu, X } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import PillNav, { PillNavItem } from './animations/PillNav';
+import { Sun, Moon } from 'lucide-react';
 
 export default function Header() {
   const { user, logout, isAuthenticated } = useAuthStore();
-  const [mounted, setMounted] = React.useState(false);
-  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const { theme, resolvedTheme, setTheme } = useTheme();
 
-  React.useEffect(() => {
+  useEffect(() => {
     setMounted(true);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = React.useCallback(async (e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
     try {
       await api.post('/auth/logout');
     } catch {
-      // Local logout should still complete if the token is expired or the API is offline.
+      // local flow handles failures silently
     } finally {
       logout();
-      setMenuOpen(false);
     }
-  };
+  }, [logout]);
+
+  const navItems = React.useMemo<PillNavItem[]>(() => {
+    const items: PillNavItem[] = [
+      { label: 'Home', href: '/' },
+      { label: 'Categories', href: '/categories' },
+      { label: 'Products', href: '/products' },
+    ];
+
+    if (mounted && isAuthenticated && user) {
+      if (user.role === 'SELLER') items.push({ label: 'Seller Portal', href: '/dashboard/seller' });
+      else if (user.role === 'ADMIN') items.push({ label: 'Admin Space', href: '/dashboard/admin' });
+      else {
+        items.push({ label: 'Buyer Dashboard', href: '/dashboard/buyer' });
+        items.push({ label: 'Cart', href: '/cart' });
+      }
+      items.push({ label: 'Sign Out', href: '#logout', onClick: handleLogout });
+    } else if (mounted) {
+      items.push({ label: 'Login', href: '/auth/login' });
+      items.push({ label: 'Register Free', href: '/auth/register' });
+    }
+    return items;
+  }, [mounted, isAuthenticated, user, handleLogout]);
+
+  const isDark = mounted && (resolvedTheme === 'dark');
+  const baseColor = isDark ? '#09090b' : '#fafafc';
+  const pillColor = isDark ? '#27272a' : '#ffffff';
+  const hoveredPillTextColor = isDark ? '#09090b' : '#ffffff';
+  const pillTextColor = isDark ? '#ffffff' : '#09090b';
+  const hoverBgColor = isDark ? '#ffffff' : '#09090b';
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-zinc-200/50 bg-white/75 backdrop-blur-md dark:border-zinc-800/50 dark:bg-zinc-950/75">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 sm:px-8">
-        {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2 group">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 shadow-md transition-transform group-hover:scale-105 overflow-hidden p-1.5">
-            <img src="/favicon.ico" alt="TATAmart Logo" className="h-full w-full object-contain" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 bg-clip-text text-transparent dark:from-white dark:to-zinc-400">
-              TATAmart
-            </span>
-            <span className="text-[10px] font-medium tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
-              B2B Marketplace
-            </span>
-          </div>
-        </Link>
-
-        {/* Navigation */}
-        <nav className="font-inter hidden md:flex items-center space-x-8 text-sm font-semibold text-zinc-600 dark:text-zinc-400">
-          <Link href="/" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
-            Home
-          </Link>
-          <Link href="/products" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
-            Explore Products
-          </Link>
-          <Link href="/categories" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
-            Categories
-          </Link>
-          {mounted && isAuthenticated && (
-            <>
-              {user?.role === 'SELLER' && (
-                <Link href="/dashboard/seller" className="text-indigo-600 dark:text-indigo-400">
-                  Seller Portal
-                </Link>
-              )}
-              {user?.role === 'ADMIN' && (
-                <Link href="/dashboard/admin" className="text-indigo-600 dark:text-indigo-400">
-                  Admin Panel
-                </Link>
-              )}
-              {user?.role === 'BUYER' && (
-                <>
-                  <Link href="/dashboard/buyer" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
-                    My Inquiries
-                  </Link>
-                  <Link href="/cart" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400 font-bold bg-indigo-50 dark:bg-indigo-950/40 py-1 px-2.5 rounded-lg text-xs text-indigo-600">
-                    Cart 🛒
-                  </Link>
-                </>
-              )}
-            </>
-          )}
-        </nav>
-
-        {/* User Auth Controls */}
-        <div className="flex items-center space-x-3">
-          {mounted ? (
-            isAuthenticated && user ? (
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2 rounded-full bg-zinc-100 py-1.5 px-3 dark:bg-zinc-800">
-                  <UserIcon className="h-4 w-4 text-zinc-500" />
-                  <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-                    {user.name} ({user.role})
-                  </span>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center justify-center h-9 w-9 rounded-xl bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white transition-all shadow-sm"
-                  title="Log Out"
-                  id="btn-logout"
-                >
-                  <LogOut className="h-4 w-4" />
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <Link
-                  href="/auth/login"
-                  className="text-sm font-semibold text-zinc-700 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
-                  id="btn-login-nav"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/auth/register"
-                  className="flex items-center space-x-1 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-xl shadow-lg shadow-indigo-600/25 dark:shadow-indigo-600/10 transition-all hover:-translate-y-0.5"
-                  id="btn-register-nav"
-                >
-                  <span>Join Free</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            )
-          ) : (
-            <div className="h-9 w-20"></div>
-          )}
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 pt-6 pb-2 ${
+        scrolled ? 'backdrop-blur-md bg-white/30 dark:bg-zinc-950/30 shadow-sm' : 'bg-transparent'
+      }`}
+      style={{ pointerEvents: 'none' }} // Let clicks pass through background
+    >
+      <div 
+        className="mx-auto flex max-w-[95%] xl:max-w-7xl items-center justify-center relative" 
+        style={{ pointerEvents: 'auto' }}
+      >
+        <PillNav
+          logo="/favicon.ico"
+          logoAlt="TATAmart Enterprise"
+          items={navItems}
+          baseColor={baseColor}
+          pillColor={pillColor}
+          hoveredPillTextColor={hoveredPillTextColor}
+          pillTextColor={pillTextColor}
+          hoverBgColor={hoverBgColor}
+        />
+        
+        {/* Theme Toggle - Positioned completely right on desktop */}
+        <div className="absolute right-0 hidden md:flex items-center">
           <button
-            onClick={() => setMenuOpen((value) => !value)}
-            className="md:hidden flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-200/60 bg-white text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
-            aria-label="Toggle navigation"
+            onClick={() => mounted && setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-700 shadow-sm transition-all duration-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            aria-label="Toggle theme"
           >
-            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            <div className="relative h-4 w-4 flex items-center justify-center">
+              <Sun className={`absolute transition-all duration-500 ease-out ${mounted && resolvedTheme === 'dark' ? 'scale-100 rotate-0 opacity-100' : 'scale-50 -rotate-90 opacity-0'}`} />
+              <Moon className={`absolute transition-all duration-500 ease-out ${!mounted || resolvedTheme !== 'dark' ? 'scale-100 rotate-0 opacity-100' : 'scale-50 rotate-90 opacity-0'}`} />
+            </div>
           </button>
         </div>
       </div>
-      {menuOpen && (
-        <div className="border-t border-zinc-200/60 bg-white px-6 py-4 shadow-lg dark:border-zinc-800 dark:bg-zinc-950 md:hidden">
-          <nav className="flex flex-col gap-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-            <Link href="/" onClick={() => setMenuOpen(false)}>Home</Link>
-            <Link href="/products" onClick={() => setMenuOpen(false)}>Explore Products</Link>
-            <Link href="/categories" onClick={() => setMenuOpen(false)}>Categories</Link>
-            {mounted && isAuthenticated && user?.role === 'BUYER' && (
-              <>
-                <Link href="/dashboard/buyer" onClick={() => setMenuOpen(false)}>My Inquiries</Link>
-                <Link href="/cart" onClick={() => setMenuOpen(false)}>Cart</Link>
-              </>
-            )}
-            {mounted && isAuthenticated && user?.role === 'SELLER' && (
-              <Link href="/dashboard/seller" onClick={() => setMenuOpen(false)}>Seller Portal</Link>
-            )}
-            {mounted && isAuthenticated && user?.role === 'ADMIN' && (
-              <Link href="/dashboard/admin" onClick={() => setMenuOpen(false)}>Admin Panel</Link>
-            )}
-          </nav>
-        </div>
-      )}
     </header>
   );
 }
