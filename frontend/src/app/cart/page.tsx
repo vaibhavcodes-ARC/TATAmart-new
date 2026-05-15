@@ -217,7 +217,7 @@ export default function CartPage() {
                           <div className="min-w-0 flex-1">
                             <h4 className="font-hero font-bold text-base text-zinc-950 dark:text-white line-clamp-1 leading-snug">{item.product.title}</h4>
                             <div className="flex flex-wrap items-center gap-2.5 mt-1.5">
-                              <span className="text-xs font-semibold text-zinc-400">Base ₹{item.product.price.toLocaleString()}</span>
+                              <span className="text-xs font-semibold text-zinc-400" suppressHydrationWarning>Base ₹{item.product.price.toLocaleString()}</span>
                               <div className="h-1 w-1 rounded-full bg-zinc-200 dark:bg-zinc-800"></div>
                               <span className="text-[9px] uppercase font-black text-brand-primary tracking-wider">Min: {item.product.moq}</span>
                             </div>
@@ -244,7 +244,7 @@ export default function CartPage() {
 
                           <div className="text-right w-28">
                             <span className="text-[10px] font-bold uppercase text-zinc-400 tracking-wider block mb-0.5">Batch Total</span>
-                            <span className="text-base font-black text-zinc-950 dark:text-white">
+                            <span className="text-base font-black text-zinc-950 dark:text-white" suppressHydrationWarning>
                               ₹{(item.product.price * item.quantity).toLocaleString()}
                             </span>
                           </div>
@@ -275,11 +275,11 @@ export default function CartPage() {
                 <div className="space-y-4">
                   <div className="flex justify-between text-xs font-bold text-zinc-400">
                     <span>Subtotal Ledger</span>
-                    <span className="text-zinc-950 dark:text-white font-black">₹{subtotal.toLocaleString()}</span>
+                    <span className="text-zinc-950 dark:text-white font-black" suppressHydrationWarning>₹{subtotal.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-xs font-bold text-zinc-400">
                     <span>GST Liability (18%)</span>
-                    <span className="text-zinc-950 dark:text-white font-black">₹{(subtotal * 0.18).toLocaleString()}</span>
+                    <span className="text-zinc-950 dark:text-white font-black" suppressHydrationWarning>₹{(subtotal * 0.18).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-xs font-bold text-zinc-400">
                     <span>Operational Freight</span>
@@ -287,7 +287,7 @@ export default function CartPage() {
                   </div>
                   <div className="pt-5 mt-1 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-end">
                     <span className="text-xs font-black uppercase tracking-widest text-zinc-500">Aggregate Total</span>
-                    <span className="text-2xl font-black text-brand-primary dark:text-indigo-400 flex items-baseline leading-none">
+                    <span className="text-2xl font-black text-brand-primary dark:text-indigo-400 flex items-baseline leading-none" suppressHydrationWarning>
                       <span className="text-sm font-black mr-0.5">₹</span>
                       {(subtotal * 1.18).toLocaleString()}
                     </span>

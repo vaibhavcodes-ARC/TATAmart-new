@@ -335,7 +335,7 @@ export default function AdminDashboard() {
                                 {p.categoryId}
                               </span>
                             </td>
-                            <td className="p-6 font-bold text-zinc-950 dark:text-white">₹{p.price.toLocaleString()}</td>
+                            <td className="p-6 font-bold text-zinc-950 dark:text-white" suppressHydrationWarning>₹{p.price.toLocaleString()}</td>
                             <td className="p-6">
                               <div className="flex flex-col">
                                 <span className="font-bold text-zinc-950 dark:text-white">{p.seller?.name || 'Unknown Operator'}</span>

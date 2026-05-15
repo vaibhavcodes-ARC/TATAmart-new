@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Header from '../../components/Header';
-import { api } from '../../utils/api';
+import { api, getApiErrorMessage } from '../../utils/api';
 import { SlidersHorizontal, ShoppingBag, Send, AlertCircle, CheckCircle2, ShieldAlert, User, Box, DollarSign, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -321,13 +321,18 @@ function ProductListContent() {
     }
   };
 
-  const handleAddToCart = async (prodId: string) => {
+  const handleAddToCart = async (prodId: string, moq: number) => {
+    if (typeof prodId === 'string' && prodId.startsWith('fb-')) {
+      alert('This is a demonstration product. Real products from the database can be added to the cart.');
+      return;
+    }
     try {
-      await api.post('/cart/items', { product_id: prodId, quantity: 1 });
+      await api.post('/cart/items', { product_id: Number(prodId), quantity: moq });
       alert('Product added to corporate cart successfully!');
     } catch (err) {
       console.error('Failed to add to cart:', err);
-      alert('Failed to add to cart. Please log in as a buyer.');
+      const errMsg = getApiErrorMessage(err, 'Failed to add to cart. Please log in as a buyer.');
+      alert(errMsg);
     }
   };
 
@@ -343,11 +348,16 @@ function ProductListContent() {
   const handleSendRFQ = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct) return;
+    if (typeof selectedProduct.id === 'string' && selectedProduct.id.startsWith('fb-')) {
+      alert('This is a demonstration product. RFQs can only be submitted for real products from the database.');
+      setSelectedProduct(null);
+      return;
+    }
     setRfqLoading(true);
     try {
       // Send inquiry
       await api.post('/products/inquire', {
-        productId: selectedProduct.id,
+        productId: Number(selectedProduct.id),
         message: rfqMessage,
       });
       setRfqSuccess(true);
@@ -358,6 +368,8 @@ function ProductListContent() {
       }, 2000);
     } catch (error) {
       console.error('Failed to submit RFQ:', error);
+      const errMsg = getApiErrorMessage(error, 'Failed to submit RFQ. Please ensure you are logged in.');
+      alert(errMsg);
     } finally {
       setRfqLoading(false);
     }
@@ -537,7 +549,7 @@ function ProductListContent() {
                       <div className="mt-auto pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-end justify-between">
                         <div className="flex flex-col">
                           <span className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 mb-0.5">Base Quote</span>
-                          <span className="text-lg font-black text-zinc-950 dark:text-white flex items-baseline leading-none">
+                          <span className="text-lg font-black text-zinc-950 dark:text-white flex items-baseline leading-none" suppressHydrationWarning>
                             <span className="text-xs font-black mr-0.5">₹</span>
                             {p.price.toLocaleString()}
                           </span>
@@ -545,7 +557,7 @@ function ProductListContent() {
                         </div>
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => handleAddToCart(p.id)}
+                            onClick={() => handleAddToCart(p.id, p.moq)}
                             className="flex items-center justify-center h-9 w-9 rounded-xl bg-zinc-50 border border-zinc-200 hover:bg-zinc-100 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:bg-zinc-750 text-zinc-600 dark:text-zinc-300 transition-all"
                             title="Allocate to Workspace Cart"
                           >
@@ -609,7 +621,7 @@ function ProductListContent() {
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-zinc-900 dark:text-white line-clamp-1">{selectedProduct.title}</h4>
-                      <p className="text-[11px] font-bold text-zinc-400 mt-0.5 uppercase tracking-wider">
+                      <p className="text-[11px] font-bold text-zinc-400 mt-0.5 uppercase tracking-wider" suppressHydrationWarning>
                         MOQ: {selectedProduct.moq} units • Base ₹{selectedProduct.price.toLocaleString()}
                       </p>
                     </div>

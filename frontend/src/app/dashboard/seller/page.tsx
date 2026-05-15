@@ -493,7 +493,7 @@ export default function SellerDashboard() {
                               {p.categoryId}
                             </span>
                           </td>
-                          <td className="p-6 font-bold text-zinc-950 dark:text-white">
+                          <td className="p-6 font-bold text-zinc-950 dark:text-white" suppressHydrationWarning>
                             ₹{p.price.toLocaleString()}
                           </td>
                           <td className="p-6">
@@ -574,12 +574,12 @@ export default function SellerDashboard() {
                         <div className="space-y-2.5 text-xs font-bold text-zinc-400">
                           <div className="flex justify-between items-center">
                             <span>Order Volume Request</span>
-                            <span className="text-zinc-950 dark:text-white font-black">{rfq.quantity.toLocaleString()} Units</span>
+                            <span className="text-zinc-950 dark:text-white font-black" suppressHydrationWarning>{rfq.quantity.toLocaleString()} Units</span>
                           </div>
                           {rfq.targetPrice && (
                             <div className="flex justify-between items-center">
                               <span>Target Cap Rate</span>
-                              <span className="text-indigo-600 font-black">₹{rfq.targetPrice.toLocaleString()}</span>
+                              <span className="text-indigo-600 font-black" suppressHydrationWarning>₹{rfq.targetPrice.toLocaleString()}</span>
                             </div>
                           )}
                           <div className="flex justify-between items-center">
@@ -600,7 +600,7 @@ export default function SellerDashboard() {
                           <div className="flex justify-between items-center w-full">
                             <span className="text-xs font-bold flex items-center gap-1.5 text-emerald-600">
                               <CheckCircle2 className="h-4 w-4" />
-                              <span>Bid Active: ₹{myBid?.priceQuote.toLocaleString()}</span>
+                              <span suppressHydrationWarning>Bid Active: ₹{myBid?.priceQuote.toLocaleString()}</span>
                             </span>
                             <span className="text-[10px] uppercase font-black text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 px-3 py-1.5 rounded-lg">
                               STATE: {myBid?.status}
@@ -668,7 +668,7 @@ export default function SellerDashboard() {
                               <span className="font-bold text-zinc-950 dark:text-white truncate">{ord.shippingAdd}</span>
                             </div>
                           </td>
-                          <td className="p-6 font-black text-zinc-950 dark:text-white">₹{ord.total.toLocaleString()}</td>
+                          <td className="p-6 font-black text-zinc-950 dark:text-white" suppressHydrationWarning>₹{ord.total.toLocaleString()}</td>
                           <td className="p-6">
                             <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:border-emerald-900/30 px-3 py-1 rounded-full border border-emerald-100 shadow-sm">
                               <Truck className="h-3.5 w-3.5 animate-pulse" />

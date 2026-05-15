@@ -325,11 +325,11 @@ export default function BuyerDashboard() {
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2.5 text-[11px] text-zinc-400 font-bold uppercase tracking-wider">
                           <span className="text-brand-primary font-black">{rfq.category.name}</span>
                           <div className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
-                          <span>{rfq.quantity.toLocaleString()} units</span>
+                          <span suppressHydrationWarning>{rfq.quantity.toLocaleString()} units</span>
                           {rfq.targetPrice && (
                             <>
                               <div className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
-                              <span>Tgt: ₹{rfq.targetPrice.toLocaleString()}</span>
+                              <span suppressHydrationWarning>Tgt: ₹{rfq.targetPrice.toLocaleString()}</span>
                             </>
                           )}
                           <div className="h-1 w-1 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
@@ -380,7 +380,7 @@ export default function BuyerDashboard() {
                                     <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
                                   )}
                                 </div>
-                                <span className="font-black text-sm text-brand-primary dark:text-indigo-400 shrink-0">
+                                <span className="font-black text-sm text-brand-primary dark:text-indigo-400 shrink-0" suppressHydrationWarning>
                                   ₹{quote.priceQuote.toLocaleString()}/unit
                                 </span>
                               </div>
@@ -581,7 +581,7 @@ export default function BuyerDashboard() {
                   </div>
                   <div>
                     <span className="block text-[9px] text-zinc-400 font-black uppercase tracking-widest mb-0.5">Contract Unit Rate</span>
-                    <span className="font-bold text-xs text-zinc-950 dark:text-white">₹{checkoutResponse.priceQuote.toLocaleString()}</span>
+                    <span className="font-bold text-xs text-zinc-950 dark:text-white" suppressHydrationWarning>₹{checkoutResponse.priceQuote.toLocaleString()}</span>
                   </div>
                   <div>
                     <span className="block text-[9px] text-zinc-400 font-black uppercase tracking-widest mb-0.5">Contract Mass</span>
@@ -589,7 +589,7 @@ export default function BuyerDashboard() {
                   </div>
                   <div>
                     <span className="block text-[9px] text-zinc-400 font-black uppercase tracking-widest mb-0.5">Aggregate Cost</span>
-                    <span className="font-black text-xs text-brand-primary">₹{(checkoutResponse.priceQuote * checkoutRfq.quantity).toLocaleString()}</span>
+                    <span className="font-black text-xs text-brand-primary" suppressHydrationWarning>₹{(checkoutResponse.priceQuote * checkoutRfq.quantity).toLocaleString()}</span>
                   </div>
                 </div>
               </div>

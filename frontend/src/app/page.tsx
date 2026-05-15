@@ -248,14 +248,8 @@ export default function Home() {
         <InfiniteMarquee
           speed={40}
           items={brandLogos.map((logo, i) => (
-            <div key={i} className="flex items-center gap-3 text-zinc-400 dark:text-zinc-600 font-black uppercase tracking-[0.2em] text-sm select-none mr-8">
-              <img 
-                src={`https://logo.clearbit.com/${logo.domain}`} 
-                alt={`${logo.name} logo`} 
-                className="h-6 w-6 object-contain grayscale opacity-60 dark:opacity-50 dark:invert" 
-                onError={(e) => { e.currentTarget.style.display = 'none'; }} 
-              />
-              <span>{logo.name}</span>
+            <div key={i} className="text-zinc-400 dark:text-zinc-600 font-black uppercase tracking-[0.2em] text-sm select-none mr-8">
+              {logo.name}
             </div>
           ))}
         />
@@ -399,7 +393,7 @@ export default function Home() {
                   <div className="mt-auto pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-end justify-between">
                     <div>
                       <span className="text-[9px] font-bold text-zinc-400 block mb-0.5">Base Unit Price</span>
-                      <span className="text-base font-black text-zinc-950 dark:text-white">
+                      <span className="text-base font-black text-zinc-950 dark:text-white" suppressHydrationWarning>
                         ₹{prod.price.toLocaleString()}
                       </span>
                       <span className="text-[8px] font-semibold block text-zinc-400 mt-0.5">MOQ: {prod.moq}</span>
