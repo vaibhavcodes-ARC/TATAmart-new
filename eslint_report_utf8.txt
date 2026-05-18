@@ -1,0 +1,205 @@
+﻿
+D:\Projects\TATAmart-new\frontend\src\app\about\page.tsx
+  35:104  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\Projects\TATAmart-new\frontend\src\app\auth\register\page.tsx
+  9:18  warning  'UserIcon' is defined but never used  @typescript-eslint/no-unused-vars
+  9:40  warning  'Building' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projects\TATAmart-new\frontend\src\app\cart\page.tsx
+  7:94  warning  'FileText' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projects\TATAmart-new\frontend\src\app\dashboard\admin\page.tsx
+  17:3  warning  'Activity' is defined but never used  @typescript-eslint/no-unused-vars
+  21:3  warning  'XCircle' is defined but never used   @typescript-eslint/no-unused-vars
+
+D:\Projects\TATAmart-new\frontend\src\app\dashboard\buyer\page.tsx
+  12:3  warning  'HelpCircle' is defined but never used  @typescript-eslint/no-unused-vars
+  27:3  warning  'DollarSign' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projects\TATAmart-new\frontend\src\app\dashboard\seller\page.tsx
+   9:3  warning  'TrendingUp' is defined but never used   @typescript-eslint/no-unused-vars
+  24:3  warning  'DollarSign' is defined but never used   @typescript-eslint/no-unused-vars
+  28:3  warning  'AlertCircle' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projects\TATAmart-new\frontend\src\app\page.tsx
+    4:8   warning  'Header' is defined but never used             @typescript-eslint/no-unused-vars
+   17:3   warning  'Globe' is defined but never used              @typescript-eslint/no-unused-vars
+   27:17  warning  'setNiche' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  115:9   warning  'features' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\Projects\TATAmart-new\frontend\src\app\privacy\page.tsx
+  5:49  warning  'CheckCircle2' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Projects\TATAmart-new\frontend\src\app\products\page.tsx
+  7:29  warning  'ShoppingBag' is defined but never used  @typescript-eslint/no-unused-vars
+  7:48  warning  'AlertCircle' is defined but never used  @typescript-eslint/no-unused-vars
+  7:88  warning  'User' is defined but never used         @typescript-eslint/no-unused-vars
+  7:99  warning  'DollarSign' is defined but never used   @typescript-eslint/no-unused-vars
+
+D:\Projects\TATAmart-new\frontend\src\app\support\page.tsx
+   10:9   warning  'categories' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  154:34  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  155:33  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  156:28  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+D:\Projects\TATAmart-new\frontend\src\components\Header.tsx
+  14:11  warning  'theme' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\Antigravity.tsx
+   56:17  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\Antigravity.tsx:56:17
+  54 |
+  55 |     for (let i = 0; i < count; i++) {
+> 56 |       const t = Math.random() * 100;
+     |                 ^^^^^^^^^^^^^ Cannot call impure function
+  57 |       const factor = 20 + Math.random() * 100;
+  58 |       const speed = 0.01 + Math.random() / 200;
+  59 |       const xFactor = -50 + Math.random() * 100;                                                                         react-hooks/purity
+   57:27  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\Antigravity.tsx:57:27
+  55 |     for (let i = 0; i < count; i++) {
+  56 |       const t = Math.random() * 100;
+> 57 |       const factor = 20 + Math.random() * 100;
+     |                           ^^^^^^^^^^^^^ Cannot call impure function
+  58 |       const speed = 0.01 + Math.random() / 200;
+  59 |       const xFactor = -50 + Math.random() * 100;
+  60 |       const yFactor = -50 + Math.random() * 100;              react-hooks/purity
+   58:28  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\Antigravity.tsx:58:28
+  56 |       const t = Math.random() * 100;
+  57 |       const factor = 20 + Math.random() * 100;
+> 58 |       const speed = 0.01 + Math.random() / 200;
+     |                            ^^^^^^^^^^^^^ Cannot call impure function
+  59 |       const xFactor = -50 + Math.random() * 100;
+  60 |       const yFactor = -50 + Math.random() * 100;
+  61 |       const zFactor = -50 + Math.random() * 100;  react-hooks/purity
+   59:29  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\Antigravity.tsx:59:29
+  57 |       const factor = 20 + Math.random() * 100;
+  58 |       const speed = 0.01 + Math.random() / 200;
+> 59 |       const xFactor = -50 + Math.random() * 100;
+     |                             ^^^^^^^^^^^^^ Cannot call impure function
+  60 |       const yFactor = -50 + Math.random() * 100;
+  61 |       const zFactor = -50 + Math.random() * 100;
+  62 |                                      react-hooks/purity
+   60:29  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\Antigravity.tsx:60:29
+  58 |       const speed = 0.01 + Math.random() / 200;
+  59 |       const xFactor = -50 + Math.random() * 100;
+> 60 |       const yFactor = -50 + Math.random() * 100;
+     |                             ^^^^^^^^^^^^^ Cannot call impure function
+  61 |       const zFactor = -50 + Math.random() * 100;
+  62 |
+  63 |       const x = (Math.random() - 0.5) * width;                                      react-hooks/purity
+   61:29  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\Antigravity.tsx:61:29
+  59 |       const xFactor = -50 + Math.random() * 100;
+  60 |       const yFactor = -50 + Math.random() * 100;
+> 61 |       const zFactor = -50 + Math.random() * 100;
+     |                             ^^^^^^^^^^^^^ Cannot call impure function
+  62 |
+  63 |       const x = (Math.random() - 0.5) * width;
+  64 |       const y = (Math.random() - 0.5) * height;                                      react-hooks/purity
+   63:18  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\Antigravity.tsx:63:18
+  61 |       const zFactor = -50 + Math.random() * 100;
+  62 |
+> 63 |       const x = (Math.random() - 0.5) * width;
+     |                  ^^^^^^^^^^^^^ Cannot call impure function
+  64 |       const y = (Math.random() - 0.5) * height;
+  65 |       const z = (Math.random() - 0.5) * 20;
+  66 |                                                                                                       react-hooks/purity
+   64:18  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\Antigravity.tsx:64:18
+  62 |
+  63 |       const x = (Math.random() - 0.5) * width;
+> 64 |       const y = (Math.random() - 0.5) * height;
+     |                  ^^^^^^^^^^^^^ Cannot call impure function
+  65 |       const z = (Math.random() - 0.5) * 20;
+  66 |
+  67 |       const randomRadiusOffset = (Math.random() - 0.5) * 2;                                                                                            react-hooks/purity
+   65:18  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\Antigravity.tsx:65:18
+  63 |       const x = (Math.random() - 0.5) * width;
+  64 |       const y = (Math.random() - 0.5) * height;
+> 65 |       const z = (Math.random() - 0.5) * 20;
+     |                  ^^^^^^^^^^^^^ Cannot call impure function
+  66 |
+  67 |       const randomRadiusOffset = (Math.random() - 0.5) * 2;
+  68 |                                                                                            react-hooks/purity
+   67:35  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\Antigravity.tsx:67:35
+  65 |       const z = (Math.random() - 0.5) * 20;
+  66 |
+> 67 |       const randomRadiusOffset = (Math.random() - 0.5) * 2;
+     |                                   ^^^^^^^^^^^^^ Cannot call impure function
+  68 |
+  69 |       temp.push({
+  70 |         t,                                                                                                                                             react-hooks/purity
+  123:16  error  'speed' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  prefer-const
+  123:23  error  'mx' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     prefer-const
+  123:27  error  'my' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     prefer-const
+  123:31  error  'mz' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     prefer-const
+  123:35  error  'cz' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     prefer-const
+  123:39  error  'randomRadiusOffset' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     prefer-const
+  135:11  error  'targetPos' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              prefer-const
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\PillNav.tsx
+  58:9   warning  'logoTweenRef' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  71:29  error    Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+D:\Projects\TATAmart-new\frontend\src\components\animations\PillNav.tsx:71:29
+   69 |   }, []);
+   70 |
+>  71 |   useIsomorphicLayoutEffect(() => {
+      |                             ^^^^^^^
+>  72 |     if (!mounted) return;
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^
+>  73 |
+      ΓÇª
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 163 |     return () => ctx.revert(); // Cleanup GSAP perfectly
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 164 |   }, [items, ease, initialLoadAnimation, mounted]);
+      | ^^^^ Passing a ref to a function may read its value during render
+  165 |
+  166 |   const handleEnter = (i: number) => {
+  167 |     const tl = tlRefs.current[i];  react-hooks/refs
+  74:9   error    'ctx' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        prefer-const
+
+Γ£û 45 problems (23 errors, 22 warnings)
+  2 errors and 0 warnings potentially fixable with the `--fix` option.
+
