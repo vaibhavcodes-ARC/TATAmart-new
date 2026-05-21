@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Lock, FileText, Globe, Server, CheckCircle2 } from 'lucide-react';
+import { Shield, Lock, FileText, Globe, Server } from 'lucide-react';
 
 export default function PrivacyPage() {
   const lastUpdated = "May 14, 2026";

@@ -45,6 +45,11 @@ class CategorySeeder extends Seeder
                 'name' => 'IT & Enterprise Hardware',
                 'is_featured' => true,
                 'children' => ['Enterprise Servers', 'AI Edge Gateways', 'Spine Switches']
+            ],
+            [
+                'name' => 'Office & Industrial Furniture',
+                'is_featured' => true,
+                'children' => ['Ergonomic Chairs', 'Modular Workstations', 'Steel Storage Cabinets']
             ]
         ];
 

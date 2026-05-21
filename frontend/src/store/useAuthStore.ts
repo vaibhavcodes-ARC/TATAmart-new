@@ -5,6 +5,7 @@ interface User {
   name: string;
   email: string;
   role: 'BUYER' | 'SELLER' | 'ADMIN';
+  email_verified_at?: string | null;
 }
 
 interface AuthState {
@@ -13,6 +14,7 @@ interface AuthState {
   isAuthenticated: boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
+  updateUser: (user: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => {
@@ -55,6 +57,16 @@ export const useAuthStore = create<AuthState>((set) => {
         localStorage.removeItem('tatamart_user');
       }
       set({ token: null, user: null, isAuthenticated: false });
+    },
+    updateUser: (updatedUser) => {
+      set((state) => {
+        if (!state.user) return state;
+        const newUser = { ...state.user, ...updatedUser };
+        if (isClient) {
+          localStorage.setItem('tatamart_user', JSON.stringify(newUser));
+        }
+        return { user: newUser };
+      });
     },
   };
 });

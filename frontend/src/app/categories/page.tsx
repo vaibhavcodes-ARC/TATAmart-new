@@ -1,19 +1,22 @@
 'use client';
 
-import React from 'react';
-import Header from '../../components/Header';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Laptop, Cpu, Package, ShoppingBag, Truck, Home, Shirt, ArrowRight, Globe } from 'lucide-react';
+import { Laptop, Cpu, Package, ShoppingBag, Truck, Home, Shirt, ArrowRight, Globe, LayoutGrid } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CategoriesPage() {
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+
   const categoriesList = [
     {
       id: 'computers',
       name: 'Computer and IT',
       description: 'Enterprise rackmount servers, network routing hardware, bulk storage, and high-performance workstations.',
       icon: Laptop,
-      color: 'bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400',
+      accent: '#3B5BDB',
+      lightBg: 'bg-blue-50 dark:bg-blue-950/20',
+      iconColor: 'text-blue-600 dark:text-blue-400',
       subcategories: ['Enterprise Servers', 'Network Switch & Routers', 'Storage Units', 'Workstations']
     },
     {
@@ -21,7 +24,9 @@ export default function CategoriesPage() {
       name: 'Electronics & Electrical',
       description: 'High precision active and passive electronics components, semiconductors, prototype PCBs, and STM32 microcontrollers.',
       icon: Cpu,
-      color: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400',
+      accent: '#7048E8',
+      lightBg: 'bg-violet-50 dark:bg-violet-950/20',
+      iconColor: 'text-violet-600 dark:text-violet-400',
       subcategories: ['Semiconductors', 'PCBs & Prototyping', 'Sensors & Modules', 'Active Components']
     },
     {
@@ -29,7 +34,9 @@ export default function CategoriesPage() {
       name: 'Logistics & Packaging',
       description: 'Industrial wooden shipping pallets, durable stretch wrap film rolls, and heavy-duty global cargo packing materials.',
       icon: Package,
-      color: 'bg-violet-50 text-violet-600 dark:bg-violet-950/30 dark:text-violet-400',
+      accent: '#5C7CFA',
+      lightBg: 'bg-indigo-50 dark:bg-indigo-950/20',
+      iconColor: 'text-indigo-600 dark:text-indigo-400',
       subcategories: ['Wooden Pallets', 'Stretch Wrap Film', 'Cargo Packings', 'Storage Boxes']
     },
     {
@@ -37,7 +44,9 @@ export default function CategoriesPage() {
       name: 'Consumer Needs',
       description: 'Premium eco-friendly biodegradable bulk hand soap, nitrile protective examination gloves, and hygiene essentials.',
       icon: ShoppingBag,
-      color: 'bg-fuchsia-50 text-fuchsia-600 dark:bg-fuchsia-950/30 dark:text-fuchsia-400',
+      accent: '#D6336C',
+      lightBg: 'bg-rose-50 dark:bg-rose-950/20',
+      iconColor: 'text-rose-600 dark:text-rose-400',
       subcategories: ['Bulk Soap', 'Nitrile Gloves', 'Sanitary Essentials', 'Cleaning Agents']
     },
     {
@@ -45,7 +54,9 @@ export default function CategoriesPage() {
       name: 'Industrial Transport',
       description: 'Heavy-payload electric cargo tricycles, hydraulic manual lift pallet jacks, and industrial utility transit vehicles.',
       icon: Truck,
-      color: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400',
+      accent: '#346941',
+      lightBg: 'bg-emerald-50 dark:bg-emerald-950/20',
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
       subcategories: ['Cargo Tricycles', 'Pallet Jacks', 'Electric Vehicles', 'Utility Trolleys']
     },
     {
@@ -53,7 +64,9 @@ export default function CategoriesPage() {
       name: 'Commercial Decor',
       description: 'Orthopedic mesh office chairs, modular conference room tables, and commercial office interior furnishings.',
       icon: Home,
-      color: 'bg-amber-50 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400',
+      accent: '#E67700',
+      lightBg: 'bg-amber-50 dark:bg-amber-950/20',
+      iconColor: 'text-amber-600 dark:text-amber-400',
       subcategories: ['Office Chairs', 'Conference Tables', 'Modular Desks', 'Lighting Systems']
     },
     {
@@ -61,79 +74,159 @@ export default function CategoriesPage() {
       name: 'Bulk Apparel',
       description: 'Combed cotton unisex blank t-shirts for branding, industrial high-visibility reflective safety vests, and custom uniforms.',
       icon: Shirt,
-      color: 'bg-cyan-50 text-cyan-600 dark:bg-cyan-950/30 dark:text-cyan-400',
+      accent: '#0C8599',
+      lightBg: 'bg-cyan-50 dark:bg-cyan-950/20',
+      iconColor: 'text-cyan-600 dark:text-cyan-400',
       subcategories: ['Blank T-Shirts', 'Reflective Vests', 'Factory Uniforms', 'Custom Hoodies']
     }
   ];
 
+  const filteredCategories = activeFilter
+    ? categoriesList.filter(c => c.id === activeFilter)
+    : categoriesList;
+
   return (
-    <div className="min-h-screen bg-[#fafafc] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-50 pt-24 selection:bg-brand-primary selection:text-white">
-      <Header />
+    <div className="min-h-screen bg-[#F9F9F9] dark:bg-[#111111] text-zinc-900 dark:text-zinc-50">
 
       <main className="mx-auto max-w-7xl px-6 py-12 sm:px-8">
-        {/* Premium atmospheric header layout */}
-        <div className="text-center mb-16 relative overflow-hidden py-16 px-6 rounded-[40px] bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/60 dark:border-zinc-800/60 shadow-2xl shadow-indigo-600/[0.02] backdrop-blur-xl">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-indigo-500/5 blur-[100px] rounded-full pointer-events-none"></div>
-          <div className="relative z-10 flex flex-col items-center">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-brand-primary bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-full mb-5">
-              <Globe className="h-3 w-3" />
-              <span>Taxonomies</span>
-            </span>
-            <h1 className="font-hero text-3xl sm:text-5xl font-black tracking-tight text-zinc-950 dark:text-white mb-4">
-              Production Niches
-            </h1>
-            <p className="text-sm sm:text-base text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto font-medium leading-relaxed">
-              Discover globally synchronized category buckets engineered for high-throughput corporate inventory procurement and volume sourcing.
-            </p>
+
+        {/* ── Hero Header ──────────────────────────────────────── */}
+        <div className="mb-16 pt-12 pb-16 border-b border-[#E5E5E5] dark:border-zinc-800">
+          <span className="font-monoenterprise text-[10px] tracking-[0.25em] text-zinc-400 dark:text-zinc-500 uppercase flex items-center gap-2 mb-4">
+            <Globe className="h-3.5 w-3.5 text-secondary" />
+            <span>Production Taxonomies</span>
+          </span>
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+            <div>
+              <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight text-ink-black dark:text-white">
+                Product <span className="italic">Categories</span>
+              </h1>
+              <p className="font-sans text-sm text-zinc-500 dark:text-zinc-400 mt-4 max-w-lg leading-relaxed">
+                Discover globally synchronized category buckets engineered for high-throughput corporate inventory procurement and volume sourcing.
+              </p>
+            </div>
+
+            {/* View All Products CTA */}
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-3 bg-ink-black dark:bg-white text-white dark:text-ink-black px-7 py-4 font-monoenterprise text-[11px] uppercase tracking-widest hover:bg-[#043F1C] dark:hover:bg-zinc-100 transition-all duration-200 active:scale-[0.99] shrink-0 self-start lg:self-auto"
+            >
+              <LayoutGrid className="h-4 w-4" />
+              <span>View All Products</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {categoriesList.map((cat, idx) => (
+        {/* ── Category Filter Pills ─────────────────────────────── */}
+        <div className="flex flex-wrap gap-2 mb-10">
+          <button
+            onClick={() => setActiveFilter(null)}
+            className={`font-monoenterprise text-[10px] uppercase tracking-widest px-4 py-2 border transition-all duration-150 ${
+              activeFilter === null
+                ? 'bg-ink-black dark:bg-white text-white dark:text-ink-black border-ink-black dark:border-white'
+                : 'bg-transparent text-zinc-500 dark:text-zinc-400 border-[#E5E5E5] dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 hover:text-ink-black dark:hover:text-white'
+            }`}
+          >
+            All Categories
+          </button>
+          {categoriesList.map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveFilter(activeFilter === cat.id ? null : cat.id)}
+                className={`flex items-center gap-1.5 font-monoenterprise text-[10px] uppercase tracking-widest px-4 py-2 border transition-all duration-150 ${
+                  activeFilter === cat.id
+                    ? 'bg-ink-black dark:bg-white text-white dark:text-ink-black border-ink-black dark:border-white'
+                    : 'bg-transparent text-zinc-500 dark:text-zinc-400 border-[#E5E5E5] dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 hover:text-ink-black dark:hover:text-white'
+                }`}
+              >
+                <Icon className="h-3 w-3" />
+                {cat.name}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ── Category Cards Grid ───────────────────────────────── */}
+        <motion.div
+          layout
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {filteredCategories.map((cat, idx) => (
             <motion.div
               key={cat.id}
-              initial={{ opacity: 0, y: 20 }}
+              layout
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: idx * 0.05, type: 'spring', bounce: 0.2 }}
-              className="group flex flex-col justify-between rounded-[36px] bg-white p-7 sm:p-8 border border-zinc-200/60 shadow-sm shadow-indigo-600/[0.01] dark:bg-zinc-900 dark:border-zinc-800/60 hover:shadow-2xl hover:-translate-y-1 duration-300 transition-all"
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.35, delay: idx * 0.04 }}
+              className="group flex flex-col justify-between bg-white dark:bg-[#181818] border border-[#E5E5E5] dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 hover:shadow-lg transition-all duration-300"
             >
-              <div>
-                <div className={`inline-flex h-14 w-14 items-center justify-center rounded-2xl ${cat.color} shadow-sm mb-6`}>
-                  <cat.icon className="h-6 w-6" />
+              {/* Card Body */}
+              <div className="p-7 sm:p-8">
+                {/* Icon */}
+                <div className={`inline-flex h-12 w-12 items-center justify-center ${cat.lightBg} ${cat.iconColor} mb-6`}>
+                  <cat.icon className="h-5 w-5" />
                 </div>
-                <h3 className="font-hero text-xl font-bold text-zinc-950 dark:text-white group-hover:text-brand-primary transition-colors">
+
+                <h3 className="font-heading text-xl font-light text-ink-black dark:text-white group-hover:text-secondary transition-colors tracking-tight">
                   {cat.name}
                 </h3>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-3 leading-relaxed font-medium flex-1">
+                <p className="font-sans text-xs text-zinc-500 dark:text-zinc-400 mt-3 leading-relaxed">
                   {cat.description}
                 </p>
 
-                <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800">
-                  <h4 className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-4">Pre-Vetted Subnodes</h4>
+                {/* Subcategories */}
+                <div className="mt-8 pt-6 border-t border-[#E5E5E5] dark:border-zinc-800">
+                  <h4 className="font-monoenterprise text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-600 mb-3">
+                    Sub-Categories
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {cat.subcategories.map((sub) => (
-                      <span key={sub} className="text-[11px] bg-zinc-50 dark:bg-zinc-800/40 py-1.5 px-3 rounded-xl text-zinc-600 dark:text-zinc-300 font-semibold border border-zinc-100 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-750 transition-colors duration-200 cursor-default">
+                      <Link
+                        key={sub}
+                        href={`/products?niche=${cat.id}&q=${encodeURIComponent(sub)}`}
+                        className="font-monoenterprise text-[10px] bg-[#F9F9F9] dark:bg-zinc-900 py-1 px-2.5 text-zinc-600 dark:text-zinc-300 border border-[#E5E5E5] dark:border-zinc-800 hover:bg-ink-black hover:text-white dark:hover:bg-white dark:hover:text-ink-black hover:border-ink-black dark:hover:border-white transition-all duration-150"
+                      >
                         {sub}
-                      </span>
+                      </Link>
                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="mt-10">
+              {/* Card Footer — CTA */}
+              <div className="border-t border-[#E5E5E5] dark:border-zinc-800">
                 <Link
                   href={`/products?niche=${cat.id}`}
-                  className="flex w-full items-center justify-center space-x-2 rounded-2xl bg-brand-primary hover:bg-indigo-600 py-3.5 text-sm font-black text-white shadow-lg shadow-indigo-600/10 transition-all active:scale-[0.98]"
+                  className="flex w-full items-center justify-between px-7 sm:px-8 py-4 bg-transparent hover:bg-ink-black dark:hover:bg-white group/btn transition-all duration-200"
                 >
-                  <span>Explore Inventory</span>
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                  <span className="font-monoenterprise text-[10px] uppercase tracking-widest text-ink-black dark:text-white group-hover/btn:text-white dark:group-hover/btn:text-ink-black transition-colors">
+                    Explore Inventory
+                  </span>
+                  <ArrowRight className="h-4 w-4 text-zinc-400 group-hover/btn:text-white dark:group-hover/btn:text-ink-black group-hover/btn:translate-x-1 transition-all duration-200" />
                 </Link>
               </div>
             </motion.div>
           ))}
+        </motion.div>
+
+        {/* ── Bottom View All CTA ───────────────────────────────── */}
+        <div className="mt-16 pt-12 border-t border-[#E5E5E5] dark:border-zinc-800 text-center">
+          <p className="font-monoenterprise text-[11px] uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-6">
+            Browse the full enterprise procurement catalog
+          </p>
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-3 border border-ink-black dark:border-white text-ink-black dark:text-white px-8 py-4 font-monoenterprise text-[11px] uppercase tracking-widest hover:bg-ink-black hover:text-white dark:hover:bg-white dark:hover:text-ink-black transition-all duration-200"
+          >
+            <span>View All Products</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </main>
     </div>
   );
 }
-

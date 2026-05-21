@@ -47,9 +47,10 @@ class RfqController extends Controller
 
         $request->validate([
             'product_name' => 'required|string|max:255',
-            'description' => 'required',
-            'quantity' => 'required|numeric',
-            'unit' => 'required',
+            'description' => 'required|string',
+            'quantity' => 'required|numeric|min:1',
+            'unit' => 'required|string',
+            'expected_price' => 'nullable|numeric|min:0.01',
             'category_id' => 'nullable|exists:categories,id'
         ]);
 
@@ -64,6 +65,30 @@ class RfqController extends Controller
             'status' => 'open'
         ]);
 
+        // Alert all corporate sellers in the network about matching RFQ demand
+        try {
+            $sellers = \App\Models\User::where('role', 'seller')->get();
+            foreach ($sellers as $seller) {
+                try {
+                    \Illuminate\Support\Facades\Mail::send('emails.rfq-alert', [
+                        'productName' => $rfq->product_name,
+                        'quantity' => $rfq->quantity,
+                        'unit' => $rfq->unit,
+                        'expectedPrice' => $rfq->expected_price,
+                        'description' => $rfq->description,
+                        'marketplaceUrl' => 'http://127.0.0.1:3000/dashboard/seller'
+                    ], function ($message) use ($seller, $rfq) {
+                        $message->to($seller->email)
+                            ->subject("New Sourcing RFQ Opportunity: {$rfq->product_name}");
+                    });
+                } catch (\Throwable $singleMailError) {
+                    logger()->error("Failed to send RFQ email alert to seller {$seller->email}: " . $singleMailError->getMessage());
+                }
+            }
+        } catch (\Throwable $e) {
+            logger()->error('RFQ email alerts delivery failed: ' . $e->getMessage());
+        }
+
         return $this->successResponse($rfq, 'RFQ created successfully');
     }
 
@@ -76,7 +101,7 @@ class RfqController extends Controller
         ]);
 
         $request->validate([
-            'offered_price' => 'required|numeric',
+            'offered_price' => 'required|numeric|min:0.01',
             'message' => 'nullable|string',
         ]);
 

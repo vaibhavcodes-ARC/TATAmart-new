@@ -7,12 +7,7 @@ import { Search, LifeBuoy, Book, MessageSquare, Ticket, ChevronDown, Send } from
 export default function SupportPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
-  const categories = [
-    { title: "Account & Access", icon: <LockKeyhole className="w-6 h-6" />, count: 12 },
-    { title: "Bidding & RFQs", icon: <Ticket className="w-6 h-6" />, count: 24 },
-    { title: "Payment & Escrow", icon: <CreditCard className="w-6 h-6" />, count: 18 },
-    { title: "Shipping & Logistics", icon: <Truck className="w-6 h-6" />, count: 30 }
-  ];
+  // categories list intentionally inlined below where used
 
   const faqs = [
     {
@@ -150,7 +145,4 @@ export default function SupportPage() {
     </div>
   );
 }
-// Adding missing icons safely
-const LockKeyhole = ({className}:any) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path><circle cx="12" cy="16" r="1"></circle></svg>
-const CreditCard = ({className}:any) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-const Truck = ({className}:any) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+// helper SVGs removed; inlined icons used where needed

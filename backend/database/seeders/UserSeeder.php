@@ -20,6 +20,7 @@ class UserSeeder extends Seeder
             'role' => 'admin',
             'phone_number' => '9999999999',
             'is_active' => true,
+            'email_verified_at' => now(),
         ]);
 
         // 2. Create Seller
@@ -30,6 +31,7 @@ class UserSeeder extends Seeder
             'role' => 'seller',
             'phone_number' => '8888888888',
             'is_active' => true,
+            'email_verified_at' => now(),
         ]);
         
         SellerProfile::create([
@@ -52,6 +54,7 @@ class UserSeeder extends Seeder
             'role' => 'buyer',
             'phone_number' => '7777777777',
             'is_active' => true,
+            'email_verified_at' => now(),
         ]);
 
         BuyerProfile::create([

@@ -1,15 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Header from '../../../components/Header';
 import { api } from '../../../utils/api';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useRouter } from 'next/navigation';
 import {
-  TrendingUp,
-  Clock,
-  ShoppingCart,
-  Percent,
   Tag,
   Plus,
   Trash2,
@@ -17,18 +12,18 @@ import {
   CheckCircle2,
   ShieldCheck,
   Truck,
-  Box,
   Activity,
   Terminal,
   FileText,
-  DollarSign,
   BarChart3,
   PackageOpen,
   X,
   AlertCircle,
-  MapPin
+  MapPin,
+  ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 interface AnalyticsData {
   totalLeads: number;
@@ -176,8 +171,22 @@ export default function SellerDashboard() {
     fetchData();
   }, [isAuthenticated, user]);
 
+  const handleOpenAddModal = () => {
+    if (user && !user.email_verified_at) {
+      alert('Operational Blockade: Please verify your corporate email before cataloging new B2B products.');
+      router.push('/auth/verify-email');
+      return;
+    }
+    setShowAddModal(true);
+  };
+
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (user && !user.email_verified_at) {
+      alert('Operational Blockade: Please verify your corporate email before cataloging new B2B products.');
+      router.push('/auth/verify-email');
+      return;
+    }
     try {
       const categoriesRes = await api.get('/categories');
       const categoriesData = categoriesRes.data?.data || categoriesRes.data || [];
@@ -229,6 +238,11 @@ export default function SellerDashboard() {
 
   const handlePlaceBid = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (user && !user.email_verified_at) {
+      alert('Operational Blockade: Please verify your corporate email before placing B2B bids.');
+      router.push('/auth/verify-email');
+      return;
+    }
     if (!biddingRfq) return;
 
     try {
@@ -257,151 +271,145 @@ export default function SellerDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#fafafc] dark:bg-[#09090b] flex flex-col">
-        <Header />
+      <div className="min-h-screen bg-[#F9F9F9] dark:bg-[#111111] flex flex-col text-ink-black dark:text-zinc-50">
         <div className="flex flex-1 items-center justify-center">
-          <div className="h-10 w-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="h-8 w-8 border-2 border-ink-black border-t-transparent dark:border-white rounded-full animate-spin"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafc] dark:bg-[#09090b] text-zinc-900 dark:text-zinc-50 pt-24 selection:bg-indigo-600 selection:text-white">
-      <Header />
+    <div className="min-h-screen bg-[#F9F9F9] dark:bg-[#111111] text-ink-black dark:text-zinc-50 pt-20 selection:bg-[#043F1C] selection:text-white transition-colors duration-300">
 
-      <main className="mx-auto max-w-7xl px-6 py-12 sm:px-8">
-        {/* Premium layout topbar header */}
-        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between mb-12 pb-8 border-b border-zinc-200/60 dark:border-zinc-800/60 gap-8">
+      <main className="mx-auto max-w-7xl px-6 py-12 md:px-16">
+        {user && !user.email_verified_at && (
+          <div className="mb-12 border border-amber-300 bg-[#F0EBE5] p-8 dark:border-amber-900/50 dark:bg-amber-950/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="flex gap-4 items-start">
+              <div className="h-10 w-10 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="font-monoenterprise text-xs font-black uppercase tracking-widest text-ink-black dark:text-white">Unverified Supply Node</h4>
+                <p className="font-sans text-xs text-zinc-550 dark:text-zinc-450 mt-1 leading-normal">
+                  Your enterprise supply-chain workspace is currently locked in read-only sandbox mode. Please verify your corporate email to catalog assets, submit wholesale bidding responses, or fulfill orders.
+                </p>
+              </div>
+            </div>
+            <Link 
+              href="/auth/verify-email" 
+              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-650 text-white font-monoenterprise text-[10px] uppercase tracking-widest py-3.5 px-6 transition-all shrink-0"
+            >
+              <span>Verify Corporate Node</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        )}
+
+        {/* Dashboard Title Header */}
+        <div className="flex flex-col xl:flex-row xl:items-end xl:justify-between pb-8 mb-12 border-b border-[#E5E5E5] dark:border-zinc-800 gap-8">
           <div>
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-full mb-3">
+            <span className="inline-flex items-center gap-1.5 text-[9px] font-monoenterprise uppercase tracking-widest text-[#043F1C] dark:text-[#346941] bg-[#F0EBE5] dark:bg-zinc-900 px-3 py-1 border border-zinc-200 mb-3">
               <Terminal className="h-3 w-3" />
-              <span>Vendor Command Matrix</span>
+              <span>Seller Control Board</span>
             </span>
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-zinc-950 dark:text-white mt-1 flex flex-wrap items-center gap-3">
-              <span>OEM Control Tower</span>
+            <h1 className="text-4xl sm:text-5xl font-medium tracking-tight text-ink-black dark:text-white font-heading mt-1 flex flex-wrap items-center gap-3">
+              <span>Seller <span className="italic">Dashboard</span></span>
               {user?.role === 'SELLER' && (
-                <span className="inline-flex items-center space-x-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-600 border border-emerald-100 dark:border-emerald-900/30 shadow-sm shrink-0">
-                  <ShieldCheck className="h-3.5 w-3.5" />
+                <span className="inline-flex items-center space-x-1 px-3 py-0.5 text-[9px] font-monoenterprise uppercase tracking-wider text-emerald-600 bg-emerald-50 border border-emerald-250/20 shadow-sm shrink-0">
+                  <ShieldCheck className="h-3 w-3" />
                   <span>Enterprise Verified</span>
                 </span>
               )}
             </h1>
-            <p className="text-[13px] font-medium text-zinc-500 dark:text-zinc-400 mt-1.5">Control high-volume manufacturing pipelines, secure active buyer demand nodes, and oversee shipping logs.</p>
+            <p className="text-[13px] font-sans text-zinc-500 dark:text-zinc-400 mt-2">Manage products catalogue, respond to buyer RFQs, and oversee orders.</p>
           </div>
 
-          {/* Dynamic glass tabbed control navigation */}
-          <div className="flex flex-wrap items-center gap-2 bg-white border border-zinc-200/60 p-1.5 rounded-[24px] dark:bg-zinc-900 dark:border-zinc-800/60 shadow-sm">
+          {/* Tab Selector Links */}
+          <div className="flex border-b border-[#E5E5E5] dark:border-zinc-850 space-x-8 xl:space-x-12 overflow-x-auto scrollbar-none pb-0.5">
             <button
               onClick={() => setActiveTab('analytics')}
-              className={`py-2.5 px-5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all whitespace-nowrap active:scale-95 ${
+              className={`pb-4 text-xs font-monoenterprise uppercase tracking-widest border-b-2 transition-all whitespace-nowrap ${
                 activeTab === 'analytics'
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
-                  : 'text-zinc-400 hover:text-zinc-800 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                  ? 'border-ink-black dark:border-white text-ink-black dark:text-white font-bold'
+                  : 'border-transparent text-zinc-450 hover:text-ink-black dark:hover:text-white'
               }`}
             >
               Analytics
             </button>
             <button
               onClick={() => setActiveTab('catalog')}
-              className={`py-2.5 px-5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all whitespace-nowrap active:scale-95 ${
+              className={`pb-4 text-xs font-monoenterprise uppercase tracking-widest border-b-2 transition-all whitespace-nowrap ${
                 activeTab === 'catalog'
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
-                  : 'text-zinc-400 hover:text-zinc-800 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                  ? 'border-ink-black dark:border-white text-ink-black dark:text-white font-bold'
+                  : 'border-transparent text-zinc-450 hover:text-ink-black dark:hover:text-white'
               }`}
             >
-              Warehouse Inventory
+              Inventory ({products.length})
             </button>
             <button
               onClick={() => setActiveTab('leads')}
-              className={`py-2.5 px-5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all whitespace-nowrap active:scale-95 ${
+              className={`pb-4 text-xs font-monoenterprise uppercase tracking-widest border-b-2 transition-all whitespace-nowrap ${
                 activeTab === 'leads'
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
-                  : 'text-zinc-400 hover:text-zinc-800 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                  ? 'border-ink-black dark:border-white text-ink-black dark:text-white font-bold'
+                  : 'border-transparent text-zinc-450 hover:text-ink-black dark:hover:text-white'
               }`}
             >
-              Bid Mesh ({rfqLeads.filter(r => r.status === 'PENDING').length} New)
+              RFQ Leads ({rfqLeads.filter(r => r.status === 'PENDING').length})
             </button>
             <button
               onClick={() => setActiveTab('orders')}
-              className={`py-2.5 px-5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all whitespace-nowrap active:scale-95 ${
+              className={`pb-4 text-xs font-monoenterprise uppercase tracking-widest border-b-2 transition-all whitespace-nowrap ${
                 activeTab === 'orders'
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
-                  : 'text-zinc-400 hover:text-zinc-800 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                  ? 'border-ink-black dark:border-white text-ink-black dark:text-white font-bold'
+                  : 'border-transparent text-zinc-450 hover:text-ink-black dark:hover:text-white'
               }`}
             >
-              Contracts Log ({orders.length})
+              Orders Log ({orders.length})
             </button>
           </div>
         </div>
 
         {/* Tab Content 1: Analytics Console */}
         {activeTab === 'analytics' && analytics && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-            {/* Luxury analytics pods */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              <div className="rounded-[28px] bg-white border border-zinc-200/60 p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800/60 group hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Procurement Payload</span>
-                  <div className="h-9 w-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-                    <ShoppingCart className="h-4 w-4" />
-                  </div>
-                </div>
-                <span className="text-3xl font-black text-zinc-950 dark:text-white">{analytics.totalLeads}</span>
-                <div className="text-[10px] text-zinc-400 mt-2 font-semibold">Total incoming direct volume requests</div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-16">
+            {/* Metric Strip */}
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border border-[#E5E5E5] dark:border-zinc-800 divide-y sm:divide-y-0 lg:divide-x lg:divide-y-0 divide-[#E5E5E5] dark:divide-zinc-800 bg-white dark:bg-zinc-950">
+              <div className="p-8">
+                <p className="font-monoenterprise text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-4">Total RFQs</p>
+                <h3 className="font-heading text-4xl font-medium text-ink-black dark:text-white">{analytics.totalLeads}</h3>
               </div>
-
-              <div className="rounded-[28px] bg-white border border-zinc-200/60 p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800/60 group hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Bid Conversion Rate</span>
-                  <div className="h-9 w-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-                    <Percent className="h-4 w-4" />
-                  </div>
-                </div>
-                <span className="text-3xl font-black text-zinc-950 dark:text-white">{analytics.responseRate}%</span>
-                <div className="text-[10px] text-zinc-400 mt-2 font-semibold">Manufacturer quotation response factor</div>
+              <div className="p-8">
+                <p className="font-monoenterprise text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-4">Conversion Rate</p>
+                <h3 className="font-heading text-4xl font-medium text-ink-black dark:text-white">{analytics.responseRate}%</h3>
               </div>
-
-              <div className="rounded-[28px] bg-white border border-zinc-200/60 p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800/60 group hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Dormant Cycles</span>
-                  <div className="h-9 w-9 rounded-xl bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-                    <Clock className="h-4 w-4" />
-                  </div>
-                </div>
-                <span className="text-3xl font-black text-zinc-950 dark:text-white">{analytics.statusCounts.PENDING}</span>
-                <div className="text-[10px] text-zinc-400 mt-2 font-semibold">Live demand nodes awaiting bids</div>
+              <div className="p-8">
+                <p className="font-monoenterprise text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-4">Pending Cycles</p>
+                <h3 className="font-heading text-4xl font-medium text-[#043F1C] dark:text-[#346941]">{analytics.statusCounts.PENDING}</h3>
               </div>
-
-              <div className="rounded-[28px] bg-white border border-zinc-200/60 p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800/60 group hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400">Active Manifests</span>
-                  <div className="h-9 w-9 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shrink-0">
-                    <Box className="h-4 w-4" />
-                  </div>
-                </div>
-                <span className="text-3xl font-black text-zinc-950 dark:text-white">{products.length}</span>
-                <div className="text-[10px] text-zinc-400 mt-2 font-semibold">Synchronized industrial catalog items</div>
+              <div className="p-8">
+                <p className="font-monoenterprise text-[10px] uppercase tracking-[0.2em] text-zinc-400 mb-4">Catalog Count</p>
+                <h3 className="font-heading text-4xl font-medium text-ink-black dark:text-white">{products.length}</h3>
               </div>
-            </div>
+            </section>
 
-            {/* Charts and breakups */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
-              {/* Top Products */}
-              <div className="rounded-[36px] bg-white border border-zinc-200/60 p-8 shadow-xl shadow-indigo-600/[0.01] dark:bg-zinc-900 dark:border-zinc-800/60">
-                <div className="flex items-center gap-2 mb-8 pb-4 border-b border-zinc-100 dark:border-zinc-800">
-                  <BarChart3 className="h-5 w-5 text-indigo-600" />
-                  <h3 className="text-[15px] font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Sought-After Assemblies</h3>
+            {/* sought after assemblies and trends */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+              {/* Sought-After Assemblies */}
+              <div className="border border-[#E5E5E5] dark:border-zinc-800 p-8 bg-white dark:bg-zinc-950">
+                <div className="flex items-center gap-2 mb-8 pb-4 border-b border-[#E5E5E5] dark:border-zinc-800">
+                  <BarChart3 className="h-4 w-4 text-[#043F1C]" />
+                  <h3 className="font-heading text-[17px] font-medium text-ink-black dark:text-white uppercase tracking-wider">Demand Assemblies Signals</h3>
                 </div>
                 
                 {analytics.topProducts.length === 0 ? (
-                  <p className="text-xs text-zinc-400 py-10 text-center">No active market inquiries recorded.</p>
+                  <p className="text-xs text-zinc-400 py-10 text-center font-sans">No active market inquiries recorded.</p>
                 ) : (
                   <div className="space-y-4">
                     {analytics.topProducts.map((p, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-4 bg-zinc-50/60 dark:bg-zinc-850/40 border border-zinc-100 dark:border-zinc-800/50 rounded-2xl hover:border-indigo-100 dark:hover:border-indigo-950 transition-colors duration-300">
-                        <span className="text-[13px] font-bold text-zinc-950 dark:text-white truncate pr-4">{p.title}</span>
-                        <span className="text-[10px] font-black uppercase bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 px-3 py-1 rounded-full shrink-0">
+                      <div key={idx} className="flex items-center justify-between p-4 bg-[#F9F9F9] dark:bg-zinc-900 border border-[#E5E5E5] dark:border-zinc-800">
+                        <span className="text-[13px] font-medium text-ink-black dark:text-white truncate pr-4">{p.title}</span>
+                        <span className="text-[9px] font-monoenterprise uppercase bg-[#F0EBE5] text-ink-black dark:bg-zinc-800 dark:text-white px-3 py-1 border border-zinc-300/40">
                           {p.inquiries_count} Signals
                         </span>
                       </div>
@@ -410,29 +418,29 @@ export default function SellerDashboard() {
                 )}
               </div>
 
-              {/* Monthly Trend graph */}
-              <div className="rounded-[36px] bg-white border border-zinc-200/60 p-8 shadow-xl shadow-indigo-600/[0.01] dark:bg-zinc-900 dark:border-zinc-800/60">
-                <div className="flex items-center gap-2 mb-8 pb-4 border-b border-zinc-100 dark:border-zinc-800">
-                  <Activity className="h-5 w-5 text-emerald-500" />
-                  <h3 className="text-[15px] font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Procurement Velocity</h3>
+              {/* Order Frequency */}
+              <div className="border border-[#E5E5E5] dark:border-zinc-800 p-8 bg-white dark:bg-zinc-950">
+                <div className="flex items-center gap-2 mb-8 pb-4 border-b border-[#E5E5E5] dark:border-zinc-800">
+                  <Activity className="h-4 w-4 text-[#346941]" />
+                  <h3 className="font-heading text-[17px] font-medium text-ink-black dark:text-white uppercase tracking-wider">Logistical Order Trends</h3>
                 </div>
 
                 {analytics.monthlyLeads.length === 0 ? (
-                  <p className="text-xs text-zinc-400 py-10 text-center">Awaiting operational ledger cycles.</p>
+                  <p className="text-xs text-zinc-400 py-10 text-center font-sans">Awaiting operational ledger cycles.</p>
                 ) : (
                   <div className="space-y-6">
                     {analytics.monthlyLeads.map((m, idx) => (
                       <div key={idx} className="space-y-2">
-                        <div className="flex justify-between text-[11px] font-bold">
-                          <span className="text-zinc-500 uppercase">{m.month}</span>
-                          <span className="text-zinc-950 dark:text-white font-black">{m.count} leads</span>
+                        <div className="flex justify-between text-[10px] font-monoenterprise uppercase tracking-wider">
+                          <span className="text-zinc-550">{m.month}</span>
+                          <span className="text-ink-black dark:text-white font-bold">{m.count} Leads</span>
                         </div>
-                        <div className="h-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200/40 dark:border-zinc-750 rounded-full overflow-hidden relative">
+                        <div className="h-4 bg-[#F9F9F9] dark:bg-zinc-900 border border-[#E5E5E5] dark:border-zinc-800 overflow-hidden relative">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${(m.count / Math.max(...analytics.monthlyLeads.map(l => l.count))) * 100}%` }}
                             transition={{ duration: 0.8, delay: idx * 0.1 }}
-                            className="h-full bg-indigo-600 rounded-full"
+                            className="h-full bg-ink-black dark:bg-white"
                           ></motion.div>
                         </div>
                       </div>
@@ -446,35 +454,35 @@ export default function SellerDashboard() {
 
         {/* Tab Content 2: Catalog Inventory Control */}
         {activeTab === 'catalog' && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 mb-20">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+          <motion.div initial={{ opacity: 0 }} className="space-y-6 mb-20">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#E5E5E5] dark:border-zinc-800 pb-4">
               <div className="flex items-center gap-2">
-                <PackageOpen className="h-5 w-5 text-indigo-600" />
-                <h3 className="text-[15px] font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Master Material Log ({products.length})</h3>
+                <PackageOpen className="h-4 w-4 text-[#043F1C]" />
+                <h3 className="font-heading text-2xl font-medium text-ink-black dark:text-white">Master Inventory Log</h3>
               </div>
               <button
-                onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center justify-center space-x-2 rounded-2xl bg-indigo-600 hover:bg-indigo-500 py-3 px-6 text-xs font-black text-white shadow-lg shadow-indigo-600/10 transition-all active:scale-[0.98]"
+                onClick={handleOpenAddModal}
+                className="bg-ink-black hover:bg-zinc-850 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-ink-black py-3 px-6 text-xs font-monoenterprise uppercase tracking-widest transition-all rounded-none"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4 inline-block mr-2 -mt-0.5" />
                 <span>Catalog New Assembly</span>
               </button>
             </div>
 
-            <div className="rounded-[36px] bg-white shadow-xl shadow-indigo-600/[0.01] border border-zinc-200/60 dark:bg-zinc-900 dark:border-zinc-800/60 overflow-hidden">
+            <div className="border border-[#E5E5E5] dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-zinc-50/50 dark:bg-zinc-950 text-[10px] font-black uppercase tracking-widest text-zinc-400 border-b border-zinc-100 dark:border-zinc-800">
-                      <th className="p-6">SKU Assembly Details</th>
-                      <th className="p-6">Industrial Class</th>
-                      <th className="p-6">Base Quote Rate</th>
-                      <th className="p-6">Warehouse Allocation</th>
-                      <th className="p-6">MOQ Level</th>
-                      <th className="p-6 text-right">Operational Matrix</th>
+                    <tr className="bg-[#F0EBE5] dark:bg-zinc-900 text-[9px] font-monoenterprise uppercase tracking-widest text-zinc-400 border-b border-[#E5E5E5] dark:border-zinc-800">
+                      <th className="p-5">SKU Assembly Details</th>
+                      <th className="p-5">Industrial Class</th>
+                      <th className="p-5">Base Quote Rate</th>
+                      <th className="p-5">Warehouse Allocation</th>
+                      <th className="p-5">MOQ Level</th>
+                      <th className="p-5 text-right">Operational Matrix</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-[13px] font-medium text-zinc-500 dark:text-zinc-400">
+                  <tbody className="divide-y divide-[#E5E5E5] dark:divide-zinc-850 text-xs font-medium text-zinc-550 dark:text-zinc-400">
                     {products.length === 0 ? (
                       <tr>
                         <td colSpan={6} className="p-12 text-center text-xs text-zinc-400 font-medium">
@@ -483,35 +491,35 @@ export default function SellerDashboard() {
                       </tr>
                     ) : (
                       products.map((p) => (
-                        <tr key={p.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-850/20 transition-all">
-                          <td className="p-6">
-                            <span className="font-bold text-zinc-950 dark:text-white block mb-0.5">{p.title}</span>
-                            <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest">#{p.id.slice(0, 8)}</span>
+                        <tr key={p.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
+                          <td className="p-5">
+                            <span className="font-heading text-[15px] font-medium text-ink-black dark:text-white block mb-1">{p.title}</span>
+                            <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest">#{p.id.slice(0, 8).toUpperCase()}</span>
                           </td>
-                          <td className="p-6">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 px-2.5 py-1 rounded-md">
+                          <td className="p-5">
+                            <span className="text-[9px] font-monoenterprise uppercase tracking-wider text-ink-black dark:text-zinc-300 bg-[#F0EBE5] dark:bg-zinc-800 px-2.5 py-1 border border-zinc-300/40">
                               {p.categoryId}
                             </span>
                           </td>
-                          <td className="p-6 font-bold text-zinc-950 dark:text-white" suppressHydrationWarning>
+                          <td className="p-5 font-mono font-bold text-ink-black dark:text-white" suppressHydrationWarning>
                             ₹{p.price.toLocaleString()}
                           </td>
-                          <td className="p-6">
+                          <td className="p-5">
                             <div className="flex items-center space-x-2">
                               <input
                                 type="number"
                                 value={p.stock}
                                 onChange={(e) => handleUpdateStock(p.id, parseInt(e.target.value) || 0)}
-                                className="w-20 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 py-1.5 px-3 text-center font-black text-zinc-950 dark:text-white outline-none focus:border-indigo-600 shadow-sm"
+                                className="w-20 rounded-none border border-zinc-250 bg-white dark:bg-zinc-900 dark:border-zinc-800 py-1.5 px-3 text-center font-mono font-bold text-ink-black dark:text-white outline-none focus:border-ink-black focus:ring-0"
                               />
-                              <span className="text-[10px] font-black uppercase text-zinc-400">Units</span>
+                              <span className="text-[9px] font-monoenterprise uppercase text-zinc-450">Units</span>
                             </div>
                           </td>
-                          <td className="p-6 font-black text-zinc-950 dark:text-white">{p.moq} Units</td>
-                          <td className="p-6 text-right">
+                          <td className="p-5 font-mono font-bold text-ink-black dark:text-white">{p.moq} Units</td>
+                          <td className="p-5 text-right">
                             <button
                               onClick={() => handleDeleteProduct(p.id)}
-                              className="h-9 w-9 rounded-xl border border-zinc-200 text-zinc-400 hover:text-red-500 hover:bg-red-50 hover:border-red-200 dark:border-zinc-800 dark:text-zinc-500 dark:hover:text-red-400 dark:hover:bg-red-950/30 inline-flex items-center justify-center transition-all"
+                              className="h-8 w-8 border border-[#E5E5E5] text-zinc-400 hover:text-red-600 hover:bg-red-50 dark:border-zinc-800 dark:text-zinc-500 dark:hover:text-red-400 dark:hover:bg-red-950/20 inline-flex items-center justify-center transition-all"
                               title="Deallocate Asset"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -529,20 +537,20 @@ export default function SellerDashboard() {
 
         {/* Tab Content 3: Leads Board & Bidding */}
         {activeTab === 'leads' && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 mb-20">
-            <div className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-indigo-600" />
-              <h3 className="text-[15px] font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Enterprise Demand Matrix</h3>
+          <motion.div initial={{ opacity: 0 }} className="space-y-6 mb-20">
+            <div className="flex items-center gap-2 pb-2 border-b border-[#E5E5E5] dark:border-zinc-800 pb-4">
+              <Activity className="h-4 w-4 text-[#043F1C]" />
+              <h3 className="font-heading text-2xl font-medium text-ink-black dark:text-white">Enterprise Demand Matrix</h3>
             </div>
 
             {rfqLeads.length === 0 ? (
-              <div className="rounded-[36px] bg-white border border-zinc-200/60 p-20 text-center text-zinc-400 shadow-xl shadow-indigo-600/[0.01] dark:bg-zinc-900 dark:border-zinc-800/60">
-                <Terminal className="h-12 w-12 text-zinc-300 dark:text-zinc-700 mx-auto mb-4" />
-                <h4 className="text-lg font-bold text-zinc-950 dark:text-white mb-2">Leads feed is vacant</h4>
-                <p className="text-xs font-medium text-zinc-400">No global buyer requests detected in synchronous cycles. Check back shortly.</p>
+              <div className="border border-[#E5E5E5] dark:border-zinc-800 bg-white dark:bg-zinc-950 p-16 text-center">
+                <Terminal className="h-10 w-10 text-zinc-300 mx-auto mb-4" />
+                <h4 className="font-heading text-lg font-medium text-ink-black dark:text-white mb-2">Leads feed is vacant</h4>
+                <p className="text-xs font-sans text-zinc-400">No global buyer requests detected in synchronous cycles.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {rfqLeads.map((rfq) => {
                   const hasResponded = rfq.responses && rfq.responses.length > 0;
                   const myBid = hasResponded ? rfq.responses[0] : null;
@@ -550,75 +558,75 @@ export default function SellerDashboard() {
                   return (
                     <div
                       key={rfq.id}
-                      className="rounded-[32px] border border-zinc-200/60 bg-white p-7 shadow-xl shadow-indigo-600/[0.01] dark:bg-zinc-900 dark:border-zinc-800/60 flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 group"
+                      className="border border-[#E5E5E5] dark:border-zinc-800 bg-white dark:bg-zinc-950 p-8 flex flex-col justify-between group relative transition-colors duration-350"
                     >
                       <div>
-                        <div className="flex justify-between items-start mb-5 border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                        <div className="flex justify-between items-start mb-6 border-b border-zinc-150 dark:border-zinc-850 pb-4">
                           <div>
-                            <span className="font-mono text-[9px] font-black text-indigo-600 tracking-widest uppercase bg-indigo-50 dark:bg-indigo-950/30 px-2.5 py-0.5 rounded-md">
-                              NODE ID: #{rfq.id.slice(0, 8)}
+                            <span className="font-mono text-[9px] font-bold text-zinc-400 block tracking-widest uppercase">
+                              LEAD IDENTIFIER: #{rfq.id.slice(0, 8).toUpperCase()}
                             </span>
-                            <h4 className="font-bold text-base text-zinc-950 dark:text-white mt-2 group-hover:text-indigo-600 transition-colors">{rfq.title}</h4>
+                            <h4 className="font-heading text-xl font-medium text-ink-black dark:text-white mt-2 group-hover:text-[#043F1C] dark:group-hover:text-[#346941] transition-colors">{rfq.title}</h4>
                           </div>
-                          <span className={`inline-flex items-center text-[10px] font-black uppercase tracking-wider py-1 px-3 rounded-full ${
+                          <span className={`inline-flex items-center text-[9px] font-monoenterprise uppercase tracking-wider py-1 px-3 border ${
                             rfq.status === 'PENDING'
-                              ? 'bg-amber-50 text-amber-600 dark:bg-amber-950/30'
+                              ? 'bg-amber-50 border-amber-200 text-amber-600 dark:bg-amber-950/20'
                               : rfq.status === 'RESPONDED'
-                              ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30'
-                              : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30'
+                              ? 'bg-indigo-50 border-indigo-200 text-indigo-600 dark:bg-indigo-950/20'
+                              : 'bg-emerald-50 border-emerald-250 text-emerald-600 dark:bg-emerald-950/20'
                           }`}>
                             {rfq.status}
                           </span>
                         </div>
 
-                        <div className="space-y-2.5 text-xs font-bold text-zinc-400">
-                          <div className="flex justify-between items-center">
-                            <span>Order Volume Request</span>
-                            <span className="text-zinc-950 dark:text-white font-black" suppressHydrationWarning>{rfq.quantity.toLocaleString()} Units</span>
+                        <div className="space-y-3 text-xs">
+                          <div className="flex justify-between items-center border-b border-zinc-50 dark:border-zinc-900 pb-2">
+                            <span className="font-monoenterprise text-[10px] text-zinc-400 uppercase tracking-wider">Demand Mass</span>
+                            <span className="text-ink-black dark:text-white font-mono font-bold" suppressHydrationWarning>{rfq.quantity.toLocaleString()} Units</span>
                           </div>
                           {rfq.targetPrice && (
-                            <div className="flex justify-between items-center">
-                              <span>Target Cap Rate</span>
-                              <span className="text-indigo-600 font-black" suppressHydrationWarning>₹{rfq.targetPrice.toLocaleString()}</span>
+                            <div className="flex justify-between items-center border-b border-zinc-50 dark:border-zinc-900 pb-2">
+                              <span className="font-monoenterprise text-[10px] text-zinc-400 uppercase tracking-wider">Target Unit Cap</span>
+                              <span className="text-[#043F1C] dark:text-[#346941] font-mono font-bold" suppressHydrationWarning>₹{rfq.targetPrice.toLocaleString()}</span>
                             </div>
                           )}
-                          <div className="flex justify-between items-center">
-                            <span>Niche Sector</span>
-                            <span className="uppercase text-[10px] font-black tracking-widest text-zinc-500 bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-100 dark:border-zinc-750 px-2.5 py-1 rounded-lg">
+                          <div className="flex justify-between items-center pb-2">
+                            <span className="font-monoenterprise text-[10px] text-zinc-400 uppercase tracking-wider">Taxonomy Sector</span>
+                            <span className="uppercase text-[9px] font-monoenterprise tracking-widest text-ink-black bg-[#F0EBE5] dark:bg-zinc-800 dark:text-white border border-zinc-350/30 px-2 py-0.5">
                               {rfq.category.name}
                             </span>
                           </div>
                         </div>
 
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-50/50 dark:bg-zinc-950/20 p-4 rounded-2xl border border-zinc-200/40 dark:border-zinc-800/30 mt-5 leading-relaxed italic">
+                        <p className="text-xs text-zinc-550 dark:text-zinc-450 bg-[#F9F9F9] dark:bg-zinc-900/60 p-4 border border-[#E5E5E5] dark:border-zinc-850 mt-6 leading-relaxed italic font-serif">
                           &ldquo;{rfq.description}&rdquo;
                         </p>
                       </div>
 
-                      <div className="mt-8 pt-5 border-t border-dashed border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-3">
+                      <div className="mt-8 pt-5 border-t border-dashed border-[#E5E5E5] dark:border-zinc-800 flex items-center justify-between gap-3">
                         {hasResponded ? (
                           <div className="flex justify-between items-center w-full">
-                            <span className="text-xs font-bold flex items-center gap-1.5 text-emerald-600">
+                            <span className="text-xs font-mono font-bold flex items-center gap-1.5 text-emerald-600">
                               <CheckCircle2 className="h-4 w-4" />
-                              <span suppressHydrationWarning>Bid Active: ₹{myBid?.priceQuote.toLocaleString()}</span>
+                              <span suppressHydrationWarning>Quoted: ₹{myBid?.priceQuote.toLocaleString()}</span>
                             </span>
-                            <span className="text-[10px] uppercase font-black text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 px-3 py-1.5 rounded-lg">
-                              STATE: {myBid?.status}
+                            <span className="text-[9px] font-monoenterprise uppercase text-zinc-400 bg-[#F0EBE5] dark:bg-zinc-900 px-2.5 py-1">
+                              {myBid?.status}
                             </span>
                           </div>
                         ) : rfq.status !== 'CLOSED' ? (
                           <>
-                            <span className="text-[10px] uppercase font-black text-zinc-400 tracking-widest">Active Demand Cycle</span>
+                            <span className="text-[9px] font-monoenterprise uppercase text-zinc-400 tracking-wider">Open Procurement Channel</span>
                             <button
                               onClick={() => setBiddingRfq(rfq)}
-                              className="inline-flex items-center space-x-1.5 py-2.5 px-5 rounded-2xl text-xs font-black uppercase bg-indigo-600 hover:bg-indigo-500 text-white transition-all shadow-lg shadow-indigo-600/10 active:scale-95"
+                              className="inline-flex items-center space-x-1.5 py-2.5 px-5 bg-ink-black hover:bg-zinc-850 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-ink-black text-xs font-monoenterprise uppercase tracking-widest transition-all rounded-none"
                             >
                               <Send className="h-3.5 w-3.5" />
-                              <span>Dispatch Quotation</span>
+                              <span>Dispatch Quote</span>
                             </button>
                           </>
                         ) : (
-                          <span className="text-xs font-bold text-zinc-400 w-full text-center py-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-100 dark:border-zinc-800">Bid Closed</span>
+                          <span className="text-xs font-mono font-bold text-zinc-400 w-full text-center py-2 bg-[#F9F9F9] dark:bg-zinc-900 border border-[#E5E5E5] dark:border-zinc-800">Bidding Closed</span>
                         )}
                       </div>
                     </div>
@@ -631,51 +639,51 @@ export default function SellerDashboard() {
 
         {/* Tab Content 4: Procured Orders Log */}
         {activeTab === 'orders' && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 mb-20">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-indigo-600" />
-              <h3 className="text-[15px] font-bold text-zinc-950 dark:text-white uppercase tracking-wider">B2B Dispatched Invoice Manifest</h3>
+          <motion.div initial={{ opacity: 0 }} className="space-y-6 mb-20">
+            <div className="flex items-center gap-2 pb-2 border-b border-[#E5E5E5] dark:border-zinc-800 pb-4">
+              <FileText className="h-4 w-4 text-[#043F1C]" />
+              <h3 className="font-heading text-2xl font-medium text-ink-black dark:text-white">Dispatched Invoice Manifests</h3>
             </div>
 
             {orders.length === 0 ? (
-              <div className="rounded-[36px] bg-white border border-zinc-200/60 p-20 text-center text-zinc-400 shadow-xl shadow-indigo-600/[0.01] dark:bg-zinc-900 dark:border-zinc-800/60">
-                <Truck className="h-12 w-12 text-zinc-300 dark:text-zinc-700 mx-auto mb-4" />
-                <h4 className="text-lg font-bold text-zinc-950 dark:text-white mb-2">Log file is unpopulated</h4>
-                <p className="text-xs font-medium text-zinc-400">No order dispatches generated for your assemblies yet.</p>
+              <div className="border border-[#E5E5E5] dark:border-zinc-800 bg-white dark:bg-zinc-950 p-16 text-center">
+                <Truck className="h-10 w-10 text-zinc-300 mx-auto mb-4" />
+                <h4 className="font-heading text-lg font-medium text-ink-black dark:text-white mb-2">Log file is unpopulated</h4>
+                <p className="text-xs font-sans text-zinc-450">No order dispatches generated for your assemblies yet.</p>
               </div>
             ) : (
-              <div className="rounded-[36px] bg-white shadow-xl shadow-indigo-600/[0.01] border border-zinc-200/60 dark:bg-zinc-900 dark:border-zinc-800/60 overflow-hidden">
+              <div className="border border-[#E5E5E5] dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-zinc-50/50 dark:bg-zinc-950 text-[10px] font-black uppercase tracking-widest text-zinc-400 border-b border-zinc-100 dark:border-zinc-800">
-                        <th className="p-6">Order Ledger ID</th>
-                        <th className="p-6">Freight Destination</th>
-                        <th className="p-6">Consolidated Value</th>
-                        <th className="p-6">Delivery Node Status</th>
-                        <th className="p-6">Operational Clock</th>
+                      <tr className="bg-[#F0EBE5] dark:bg-zinc-900 text-[9px] font-monoenterprise uppercase tracking-widest text-zinc-400 border-b border-[#E5E5E5] dark:border-zinc-800">
+                        <th className="p-5">Order Ledger ID</th>
+                        <th className="p-5">Freight Destination Address</th>
+                        <th className="p-5">Consolidated Valuation</th>
+                        <th className="p-5">Delivery Node Status</th>
+                        <th className="p-5">Fulfillment Timestamp</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-[13px] font-medium text-zinc-500 dark:text-zinc-400">
+                    <tbody className="divide-y divide-[#E5E5E5] dark:divide-zinc-850 text-xs font-medium text-zinc-550 dark:text-zinc-400">
                       {orders.map((ord) => (
-                        <tr key={ord.id} className="hover:bg-zinc-50/40 dark:hover:bg-zinc-850/20 transition-all">
-                          <td className="p-6">
-                            <span className="font-mono font-black text-indigo-600 tracking-wider text-xs uppercase">#{ord.id.slice(0, 8)}</span>
+                        <tr key={ord.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
+                          <td className="p-5">
+                            <span className="font-mono font-bold text-[#043F1C] dark:text-[#346941] tracking-wider text-xs">#{ord.id.slice(0, 8).toUpperCase()}</span>
                           </td>
-                          <td className="p-6 max-w-xs truncate">
+                          <td className="p-5 max-w-xs truncate">
                             <div className="flex items-center gap-1.5">
-                              <MapPin className="h-3.5 w-3.5 text-zinc-300 dark:text-zinc-700 shrink-0" />
-                              <span className="font-bold text-zinc-950 dark:text-white truncate">{ord.shippingAdd}</span>
+                              <MapPin className="h-3.5 w-3.5 text-zinc-300 shrink-0" />
+                              <span className="font-bold text-ink-black dark:text-white truncate">{ord.shippingAdd}</span>
                             </div>
                           </td>
-                          <td className="p-6 font-black text-zinc-950 dark:text-white" suppressHydrationWarning>₹{ord.total.toLocaleString()}</td>
-                          <td className="p-6">
-                            <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:border-emerald-900/30 px-3 py-1 rounded-full border border-emerald-100 shadow-sm">
-                              <Truck className="h-3.5 w-3.5 animate-pulse" />
+                          <td className="p-5 font-mono font-bold text-ink-black dark:text-white" suppressHydrationWarning>₹{ord.total.toLocaleString()}</td>
+                          <td className="p-5">
+                            <span className="inline-flex items-center gap-1 text-[9px] font-monoenterprise uppercase tracking-wider bg-[#F0EBE5] text-ink-black dark:bg-zinc-800 dark:text-white px-3 py-1 border border-zinc-300/40">
+                              <Truck className="h-3.5 w-3.5" />
                               <span>{ord.status}</span>
                             </span>
                           </td>
-                          <td className="p-6 text-zinc-400 font-bold">{new Date(ord.createdAt).toLocaleDateString()}</td>
+                          <td className="p-5 text-zinc-400 font-mono" suppressHydrationWarning>{new Date(ord.createdAt).toLocaleDateString()}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -699,38 +707,38 @@ export default function SellerDashboard() {
               className="absolute inset-0 bg-zinc-950/60 backdrop-blur-sm"
             />
             <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="relative w-full max-w-xl rounded-[36px] bg-white p-8 shadow-2xl border border-zinc-200/60 dark:bg-zinc-900 dark:border-zinc-800/60 overflow-hidden z-10"
+              initial={{ scale: 0.98, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.98, opacity: 0 }}
+              className="relative w-full max-w-xl bg-white p-8 dark:bg-zinc-950 border border-ink-black dark:border-zinc-800 z-10"
             >
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#E5E5E5] dark:border-zinc-800">
                 <div className="flex items-center gap-2">
-                  <Send className="h-5 w-5 text-indigo-600" />
-                  <h3 className="text-lg font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Execute Competitive Quotation</h3>
+                  <Send className="h-5 w-5 text-ink-black dark:text-white" />
+                  <h3 className="font-heading text-2xl font-medium text-ink-black dark:text-white">Execute Competitive Quotation</h3>
                 </div>
-                <button onClick={() => setBiddingRfq(null)} className="h-8 w-8 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 transition-colors">
+                <button onClick={() => setBiddingRfq(null)} className="h-8 w-8 hover:bg-zinc-100 dark:hover:bg-zinc-900 flex items-center justify-center text-zinc-400 transition-colors">
                   <X className="h-4 w-4" />
                 </button>
               </div>
 
-              <p className="text-xs font-medium text-zinc-500 mb-6">Supply strategic pricing to secure the contract payload for Lead ID #{biddingRfq.id.slice(0, 8).toUpperCase()}.</p>
+              <p className="text-xs font-sans text-zinc-550 mb-6">Supply strategic pricing parameters to secure the contract payload for Lead ID #{biddingRfq.id.slice(0, 8).toUpperCase()}.</p>
 
-              <form onSubmit={handlePlaceBid} className="space-y-5">
-                <div className="grid grid-cols-2 gap-5">
+              <form onSubmit={handlePlaceBid} className="space-y-6 text-xs">
+                <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">OEM Unit Quote (INR)</label>
+                    <label className="block font-monoenterprise text-[10px] uppercase tracking-widest text-zinc-400 mb-2 ml-1">OEM Unit Quote (INR)</label>
                     <input
                       type="number"
                       required
                       value={bidPrice}
                       onChange={(e) => setBidPrice(e.target.value)}
                       placeholder={biddingRfq.targetPrice?.toString() || 'e.g. 1800'}
-                      className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none focus:border-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white shadow-sm"
+                      className="w-full rounded-none border border-zinc-250 bg-white dark:bg-zinc-900 dark:border-zinc-800 py-3.5 px-4 text-[13px] font-mono font-bold text-ink-black dark:text-white outline-none focus:border-ink-black focus:ring-0"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Commitment SLA (Days)</label>
+                    <label className="block font-monoenterprise text-[10px] uppercase tracking-widest text-zinc-400 mb-2 ml-1">Commitment SLA (Days)</label>
                     <input
                       type="number"
                       required
@@ -738,37 +746,37 @@ export default function SellerDashboard() {
                       value={bidLeadTime}
                       onChange={(e) => setBidLeadTime(e.target.value)}
                       placeholder="e.g. 7"
-                      className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none focus:border-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white shadow-sm"
+                      className="w-full rounded-none border border-zinc-250 bg-white dark:bg-zinc-900 dark:border-zinc-800 py-3.5 px-4 text-[13px] font-mono font-bold text-ink-black dark:text-white outline-none focus:border-ink-black focus:ring-0"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Compliance Annotations & Terms</label>
+                  <label className="block font-monoenterprise text-[10px] uppercase tracking-widest text-zinc-400 mb-2 ml-1">Compliance Annotations</label>
                   <textarea
-                    rows={3}
+                    rows={4}
                     value={bidNotes}
                     onChange={(e) => setBidNotes(e.target.value)}
-                    placeholder="Specify QC warranties, RoHS certifications, custom packaging layouts..."
-                    className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none focus:border-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white resize-none shadow-sm"
+                    placeholder="Specify QC warranties, RoHS compliance certifications, shipping layout dimensions..."
+                    className="w-full rounded-none border border-zinc-250 bg-white dark:bg-zinc-900 dark:border-zinc-800 py-3.5 px-4 text-[13px] font-medium text-ink-black dark:text-zinc-300 outline-none focus:border-ink-black focus:ring-0 resize-none"
                   />
                 </div>
 
-                <div className="flex justify-end items-center space-x-3 pt-6 border-t border-zinc-100 dark:border-zinc-800 mt-6">
+                <div className="flex justify-end items-center space-x-4 pt-6 border-t border-[#E5E5E5] dark:border-zinc-850 mt-6">
                   <button
                     type="button"
                     onClick={() => setBiddingRfq(null)}
-                    className="py-3 px-6 rounded-2xl text-xs font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all"
+                    className="py-3 px-6 text-xs font-monoenterprise uppercase tracking-widest text-zinc-400 hover:text-ink-black dark:hover:text-white transition-all"
                   >
                     Decline
                   </button>
                   <button
                     type="submit"
                     disabled={biddingSubmitting}
-                    className="rounded-2xl bg-indigo-600 hover:bg-indigo-500 py-3.5 px-8 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-600/15 transition-all flex items-center justify-center active:scale-[0.98]"
+                    className="bg-ink-black hover:bg-zinc-850 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-ink-black py-3.5 px-8 text-xs font-monoenterprise uppercase tracking-widest transition-all rounded-none"
                   >
                     {biddingSubmitting ? (
-                      <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <div className="h-4 w-4 border-2 border-white border-t-transparent dark:border-ink-black rounded-full animate-spin"></div>
                     ) : (
                       <span>Lock In Quote</span>
                     )}
@@ -785,88 +793,88 @@ export default function SellerDashboard() {
         {showAddModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-sm">
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
+              initial={{ scale: 0.98, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-xl bg-white rounded-[36px] border border-zinc-200/60 dark:bg-zinc-900 dark:border-zinc-800/60 p-8 shadow-2xl overflow-hidden relative z-10"
+              exit={{ scale: 0.98, opacity: 0 }}
+              className="relative w-full max-w-xl bg-white dark:bg-zinc-950 border border-ink-black dark:border-zinc-800 p-8 z-10"
             >
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-100 dark:border-zinc-800">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#E5E5E5] dark:border-zinc-800">
                 <div className="flex items-center gap-2">
-                  <Tag className="h-5 w-5 text-indigo-600" />
-                  <h3 className="text-lg font-bold text-zinc-950 dark:text-white uppercase tracking-wider">Inventory Provision Node</h3>
+                  <Tag className="h-5 w-5 text-ink-black dark:text-white" />
+                  <h3 className="font-heading text-2xl font-medium text-ink-black dark:text-white">Inventory Provision Node</h3>
                 </div>
-                <button onClick={() => setShowAddModal(false)} className="h-8 w-8 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-400 transition-colors">
+                <button onClick={() => setShowAddModal(false)} className="h-8 w-8 hover:bg-zinc-100 dark:hover:bg-zinc-900 flex items-center justify-center text-zinc-400 transition-colors">
                   <X className="h-4 w-4" />
                 </button>
               </div>
 
-              <form onSubmit={handleAddProduct} className="space-y-5">
+              <form onSubmit={handleAddProduct} className="space-y-6 text-xs">
                 <div>
-                  <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Asset Descriptor / Name</label>
+                  <label className="block font-monoenterprise text-[10px] uppercase tracking-widest text-zinc-400 mb-2 ml-1">Asset Descriptor / Name</label>
                   <input
                     type="text"
                     required
                     value={prodTitle}
                     onChange={(e) => setProdTitle(e.target.value)}
                     placeholder="e.g. High-Precision Linear Actuator 12V-24V"
-                    className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none focus:border-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white shadow-sm"
+                    className="w-full rounded-none border border-zinc-250 bg-white dark:bg-zinc-900 dark:border-zinc-800 py-3.5 px-4 text-[13px] font-medium text-ink-black dark:text-zinc-200 outline-none focus:border-ink-black focus:ring-0"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Operational Parameters & Datasheet</label>
+                  <label className="block font-monoenterprise text-[10px] uppercase tracking-widest text-zinc-400 mb-2 ml-1">Operational Datasheet Specs</label>
                   <textarea
                     required
                     rows={3}
                     value={prodDesc}
                     onChange={(e) => setProdDesc(e.target.value)}
-                    placeholder="Enter load capacity, stroke length, duty cycle factors..."
-                    className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none focus:border-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white resize-none shadow-sm"
+                    placeholder="Enter technical parameters: load limits, frequency response, duty cycle factors..."
+                    className="w-full rounded-none border border-zinc-250 bg-white dark:bg-zinc-900 dark:border-zinc-800 py-3.5 px-4 text-[13px] font-medium text-ink-black dark:text-zinc-300 outline-none focus:border-ink-black focus:ring-0 resize-none"
                   />
                 </div>
 
                 <div className="grid grid-cols-3 gap-5">
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Base Price (INR)</label>
+                    <label className="block font-monoenterprise text-[10px] uppercase tracking-widest text-zinc-400 mb-2 ml-1">Base Price (INR)</label>
                     <input
                       type="number"
                       required
                       value={prodPrice}
                       onChange={(e) => setProdPrice(e.target.value)}
                       placeholder="e.g. 12000"
-                      className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none focus:border-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white shadow-sm"
+                      className="w-full rounded-none border border-zinc-250 bg-white dark:bg-zinc-900 dark:border-zinc-800 py-3.5 px-4 text-[13px] font-mono font-bold text-ink-black dark:text-white outline-none focus:border-ink-black focus:ring-0"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Unit MOQ</label>
+                    <label className="block font-monoenterprise text-[10px] uppercase tracking-widest text-zinc-400 mb-2 ml-1">Unit MOQ</label>
                     <input
                       type="number"
                       required
                       value={prodMoq}
                       onChange={(e) => setProdMoq(e.target.value)}
                       placeholder="e.g. 10"
-                      className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none focus:border-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white shadow-sm"
+                      className="w-full rounded-none border border-zinc-250 bg-white dark:bg-zinc-900 dark:border-zinc-800 py-3.5 px-4 text-[13px] font-mono font-bold text-ink-black dark:text-white outline-none focus:border-ink-black focus:ring-0"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Starting Stock</label>
+                    <label className="block font-monoenterprise text-[10px] uppercase tracking-widest text-zinc-400 mb-2 ml-1">Starting Stock</label>
                     <input
                       type="number"
                       required
                       value={prodStock}
                       onChange={(e) => setProdStock(e.target.value)}
                       placeholder="e.g. 250"
-                      className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-medium text-zinc-950 outline-none focus:border-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white shadow-sm"
+                      className="w-full rounded-none border border-zinc-250 bg-white dark:bg-zinc-900 dark:border-zinc-800 py-3.5 px-4 text-[13px] font-mono font-bold text-ink-black dark:text-white outline-none focus:border-ink-black focus:ring-0"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 ml-1">Product taxonomy Niche</label>
+                  <label className="block font-monoenterprise text-[10px] uppercase tracking-widest text-zinc-400 mb-2 ml-1">Product Taxonomy Niche</label>
                   <select
                     value={prodCategory}
                     onChange={(e) => setProdCategory(e.target.value)}
-                    className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 px-4 text-[13px] font-black text-zinc-950 outline-none focus:border-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white shadow-sm cursor-pointer"
+                    className="w-full rounded-none border border-zinc-250 bg-white dark:bg-zinc-900 dark:border-zinc-800 py-3.5 px-4 text-[13px] font-black text-ink-black dark:text-zinc-200 outline-none focus:border-ink-black focus:ring-0 cursor-pointer"
                   >
                     <option value="">Synchronize Category</option>
                     <option value="electronics">Electronics & Electrical</option>
@@ -878,7 +886,7 @@ export default function SellerDashboard() {
 
                 <button
                   type="submit"
-                  className="w-full rounded-2xl bg-indigo-600 hover:bg-indigo-500 py-4 text-[14px] font-black text-white transition-all shadow-lg shadow-indigo-600/15 flex items-center justify-center mt-6 active:scale-[0.99]"
+                  className="w-full bg-ink-black hover:bg-zinc-850 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-ink-black py-4 text-xs font-monoenterprise uppercase tracking-widest transition-all rounded-none flex items-center justify-center mt-6"
                 >
                   <span>Transmit to Live Registry</span>
                 </button>

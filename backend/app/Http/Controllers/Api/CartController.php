@@ -61,6 +61,12 @@ class CartController extends Controller
         $request->validate(['quantity' => 'required|integer|min:1']);
         
         $item = \App\Models\CartItem::findOrFail($itemId);
+        $product = $item->product;
+
+        if ($request->input('quantity') < $product->min_order_quantity) {
+            return $this->errorResponse("Quantity cannot be below the minimum order quantity of {$product->min_order_quantity}.", 422);
+        }
+        
         $item->update(['quantity' => $request->input('quantity')]);
 
         return $this->successResponse($item, 'Cart updated');

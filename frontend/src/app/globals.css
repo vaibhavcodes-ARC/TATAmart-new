@@ -3,32 +3,103 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #fcfcfd;
-  --foreground: #18181b;
-  --brand-primary: #5c3eb8;
-  --brand-secondary: #4f46e5;
-  --font-hero: var(--font-heading);
-  --font-inter: var(--font-sans);
-  --font-monoenterprise: "IBM Plex Sans", "Inter", system-ui, sans-serif;
-  --font-footer: "Manrope", "Inter", system-ui, sans-serif;
+  --background: #f9f9f9;
+  --foreground: #1a1c1c;
+
+  --surface: #f9f9f9;
+  --surface-dim: #dadada;
+  --surface-bright: #f9f9f9;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f3f3f4;
+  --surface-container: #eeeeee;
+  --surface-container-high: #e8e8e8;
+  --surface-container-highest: #e2e2e2;
+  --on-surface: #1a1c1c;
+  --on-surface-variant: #464741;
+  --inverse-surface: #2f3131;
+  --inverse-on-surface: #f0f1f1;
+  --outline: #777771;
+  --outline-variant: #c7c7bf;
+
+  --primary: #020302;
+  --on-primary: #ffffff;
+  --primary-container: #1d1d1b;
+  --on-primary-container: #868582;
+
+  --secondary: #346941;
+  --on-secondary: #ffffff;
+  --secondary-container: #b4eebb;
+  --on-secondary-container: #396d45;
+
+  --tertiary: #030302;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #1e1d19;
+  --on-tertiary-container: #888580;
+
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+
+  --ink-black: #1D1D1B;
+  --forest-accent: #043F1C;
+  --paper-neutral: #F0EBE5;
+  --border-subtle: #E5E5E5;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-brand-primary: var(--brand-primary);
-  --color-brand-secondary: var(--brand-secondary);
-  --font-heading: var(--font-plus-jakarta), sans-serif;
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+
+  --color-secondary: var(--secondary);
+  --color-on-secondary: var(--on-secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+
+  --color-ink-black: var(--ink-black);
+  --color-forest-accent: var(--forest-accent);
+  --color-paper-neutral: var(--paper-neutral);
+  --color-border-subtle: var(--border-subtle);
+
+  --font-heading: var(--font-eb-garamond), serif;
   --font-sans: var(--font-space-grotesk), sans-serif;
-  --font-hero: var(--font-plus-jakarta), sans-serif;
+  --font-hero: var(--font-eb-garamond), serif;
   --font-inter: var(--font-space-grotesk), sans-serif;
-  --font-monoenterprise: var(--font-monoenterprise);
-  --font-footer: var(--font-footer);
+  --font-monoenterprise: var(--font-geist-mono), monospace;
+  --font-footer: var(--font-space-grotesk), sans-serif;
 }
 
 .dark {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --background: #111111;
+  --foreground: #f3f3f3;
+  --surface: #111111;
+  --surface-container-lowest: #0c0c0c;
+  --surface-container-low: #181818;
+  --surface-container: #222222;
+  --on-surface: #f3f3f3;
+  --on-surface-variant: #b5b5b5;
+  --outline: #9b9b9b;
+  --outline-variant: #444444;
+  --border-subtle: #2d2d2d;
+  --ink-black: #0c0c0c;
+  --paper-neutral: #1a1816;
 }
 
 html {
@@ -88,4 +159,34 @@ h1, h2, h3, h4, h5, h6, .font-heading, .font-hero {
 .animate-infinite-marquee:hover {
   animation-play-state: paused;
 }
+
+/* Stitch Revamp helper classes */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.hero-zoom {
+  transition: transform 12s linear;
+}
+.hero-zoom:hover {
+  transform: scale(1.05);
+}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+.editorial-line {
+  height: 1px;
+  background: currentColor;
+  width: 0;
+  transition: width 0.8s ease-out;
+}
+.reveal.active .editorial-line, .active .editorial-line {
+  width: 100%;
+}
+
 

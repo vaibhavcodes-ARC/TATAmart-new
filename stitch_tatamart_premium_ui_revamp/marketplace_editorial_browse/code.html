@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TataMart | Global B2B Marketplace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 2px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1d1d1b;
+            border-radius: 0px;
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-skeleton {
+            animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        body {
+            font-family: 'Hanken Grotesk', sans-serif;
+        }
+        .editorial-font {
+            font-family: 'EB Garamond', serif;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#f9f9f9",
+                      "surface-bright": "#f9f9f9",
+                      "outline-variant": "#c7c7bf",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-fixed": "#e5e2de",
+                      "on-surface-variant": "#464741",
+                      "primary": "#020302",
+                      "primary-fixed-dim": "#c8c6c3",
+                      "on-primary-fixed": "#1c1c1a",
+                      "border-subtle": "#E5E5E5",
+                      "on-primary-fixed-variant": "#474744",
+                      "on-tertiary-fixed-variant": "#494642",
+                      "inverse-surface": "#2f3131",
+                      "tertiary": "#030302",
+                      "on-tertiary-fixed": "#1d1b18",
+                      "on-secondary-container": "#396d45",
+                      "tertiary-fixed-dim": "#cac6c0",
+                      "surface-tint": "#5f5e5c",
+                      "outline": "#777771",
+                      "primary-container": "#1d1d1b",
+                      "on-secondary-fixed-variant": "#1b512c",
+                      "on-primary-container": "#868582",
+                      "error-container": "#ffdad6",
+                      "surface-container": "#eeeeee",
+                      "error": "#ba1a1a",
+                      "background": "#f9f9f9",
+                      "secondary": "#346941",
+                      "secondary-fixed-dim": "#9bd4a3",
+                      "tertiary-fixed": "#e7e2dc",
+                      "tertiary-container": "#1e1d19",
+                      "on-background": "#1a1c1c",
+                      "surface-container-high": "#e8e8e8",
+                      "on-tertiary": "#ffffff",
+                      "on-surface": "#1a1c1c",
+                      "inverse-primary": "#c8c6c3",
+                      "on-error": "#ffffff",
+                      "paper-neutral": "#F0EBE5",
+                      "surface-container-highest": "#e2e2e2",
+                      "secondary-fixed": "#b6f0be",
+                      "on-secondary": "#ffffff",
+                      "ink-black": "#1D1D1B",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#dadada",
+                      "inverse-on-surface": "#f0f1f1",
+                      "secondary-container": "#b4eebb",
+                      "on-tertiary-container": "#888580",
+                      "on-secondary-fixed": "#00210b",
+                      "forest-accent": "#043F1C",
+                      "surface-variant": "#e2e2e2",
+                      "on-primary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0px",
+                      "lg": "0px",
+                      "xl": "0px",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "32px",
+                      "container-max": "1440px",
+                      "margin-mobile": "20px",
+                      "base": "8px",
+                      "margin-desktop": "64px"
+              },
+              "fontFamily": {
+                      "label-caps": ["Geist"],
+                      "label-mono": ["Geist"],
+                      "body-md": ["Hanken Grotesk"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "display-lg-mobile": ["EB Garamond"],
+                      "headline-xl": ["EB Garamond"],
+                      "display-lg": ["EB Garamond"],
+                      "body-lg": ["Hanken Grotesk"]
+              },
+              "fontSize": {
+                      "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.12em", "fontWeight": "600"}],
+                      "label-mono": ["13px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg-mobile": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                      "headline-xl": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                      "display-lg": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "500"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary selection:text-white">
+<!-- Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-white/95 border-b border-outline-variant/20">
+<div class="flex justify-between items-center px-margin-desktop h-24 max-w-container-max mx-auto">
+<div class="flex items-center gap-12">
+<span class="editorial-font text-[32px] font-medium tracking-tight text-primary">TataMart</span>
+<nav class="hidden lg:flex items-center gap-8">
+<a class="text-label-caps uppercase text-primary border-b border-primary pb-1" href="#">Marketplace</a>
+<a class="text-label-caps uppercase text-on-surface-variant hover:text-primary transition-colors" href="#">Suppliers</a>
+<a class="text-label-caps uppercase text-on-surface-variant hover:text-primary transition-colors" href="#">Logistics</a>
+</nav>
+</div>
+<div class="flex items-center gap-8">
+<div class="relative hidden xl:flex items-center">
+<input class="border-b border-outline-variant/50 focus:border-primary py-1 w-64 text-body-md bg-transparent outline-none transition-all placeholder:text-outline-variant" placeholder="Search components..." type="text"/>
+<span class="material-symbols-outlined absolute right-0 text-[18px]">search</span>
+</div>
+<div class="flex items-center gap-6">
+<button class="hover:opacity-70 transition-opacity"><span class="material-symbols-outlined">shopping_bag</span></button>
+<button class="hover:opacity-70 transition-opacity"><span class="material-symbols-outlined">person</span></button>
+<button class="bg-primary text-white px-8 py-3 text-label-caps uppercase hover:bg-on-surface-variant transition-all">Create RFP</button>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-24 flex max-w-container-max mx-auto px-margin-desktop min-h-screen gap-12">
+<!-- Boutique Sidebar -->
+<aside class="w-72 hidden lg:flex flex-col gap-10 sticky top-32 h-[calc(100vh-160px)] pr-8 border-r border-outline-variant/10 overflow-y-auto custom-scrollbar">
+<div>
+<h2 class="text-label-caps uppercase mb-8 text-primary font-bold">Refine By</h2>
+<section class="mb-10">
+<h3 class="text-label-caps uppercase text-outline mb-4">Industry</h3>
+<div class="space-y-3">
+<label class="flex items-center justify-between group cursor-pointer">
+<span class="text-body-md text-on-surface-variant group-hover:text-primary">Industrial Parts</span>
+<input checked="" class="w-4 h-4 border-outline-variant rounded-none text-primary focus:ring-0" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between group cursor-pointer">
+<span class="text-body-md text-on-surface-variant group-hover:text-primary">Semiconductors</span>
+<input class="w-4 h-4 border-outline-variant rounded-none text-primary focus:ring-0" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between group cursor-pointer">
+<span class="text-body-md text-on-surface-variant group-hover:text-primary">Raw Materials</span>
+<input class="w-4 h-4 border-outline-variant rounded-none text-primary focus:ring-0" type="checkbox"/>
+</label>
+</div>
+</section>
+<section class="mb-10">
+<h3 class="text-label-caps uppercase text-outline mb-6">Delivery Speed</h3>
+<input class="w-full h-[1px] bg-outline-variant appearance-none cursor-pointer accent-primary" type="range"/>
+<div class="flex justify-between mt-2 text-label-caps text-outline text-[10px]">
+<span>Immediate</span>
+<span>30+ Days</span>
+</div>
+</section>
+<section class="mb-10">
+<h3 class="text-label-caps uppercase text-outline mb-4">Region</h3>
+<div class="relative">
+<select class="w-full bg-transparent border-b border-outline-variant py-2 text-body-md appearance-none focus:outline-none focus:border-primary">
+<option>Global Distribution</option>
+<option>North America</option>
+<option>Asia Pacific</option>
+<option>Europe</option>
+</select>
+<span class="material-symbols-outlined absolute right-0 top-2 text-[18px] pointer-events-none">expand_more</span>
+</div>
+</section>
+<button class="text-label-caps uppercase border-b border-primary text-primary w-fit pb-1 hover:opacity-70 transition-opacity">Clear Filters</button>
+</div>
+<div class="mt-auto bg-paper-neutral p-6">
+<p class="editorial-font text-headline-md italic leading-tight">Sourcing Concierge</p>
+<p class="text-body-md text-on-surface-variant mt-2 text-sm">Personalized procurement for high-stakes enterprise projects.</p>
+<button class="mt-4 text-label-caps uppercase flex items-center gap-2 group">
+Start Inquire <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+</button>
+</div>
+</aside>
+<!-- Editorial Marketplace Canvas -->
+<section class="flex-1">
+<div class="flex flex-col md:flex-row md:items-baseline justify-between mb-12 gap-6 border-b border-outline-variant/10 pb-6">
+<div>
+<h1 class="editorial-font text-[56px] leading-[0.9] tracking-tighter text-primary">Technical Precision</h1>
+<p class="text-on-surface-variant text-body-lg mt-4 italic">A curated selection of 1,240 industrial excellence components.</p>
+</div>
+<div class="flex items-center gap-6">
+<select class="bg-transparent text-label-caps uppercase border-none focus:ring-0 cursor-pointer">
+<option>Sort: Relevant</option>
+<option>Sort: Price High</option>
+<option>Sort: Price Low</option>
+</select>
+</div>
+</div>
+<!-- Product Grid: Large Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-gutter gap-y-16">
+<!-- Product Card 1 -->
+<div class="group flex flex-col">
+<div class="relative aspect-[4/5] overflow-hidden bg-surface-container mb-6">
+<img alt="Processor" class="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQR8mDl6l64jK_Kv7cJeDvjo04cfd5sBKjfNv7_KuRekp06mFcHdIVoqpUDroZXos2t3vkLZgXMErfWqvvVMKnnzmZ6DA70dbjTFmou_fu9wW9PlmvNFUIerX4ctDRZHYO_UgB7DNHERirER2EpLiIsiGo53RTuu_WTTy3hEdfHqZqXdst9gRRsnGZAano_E56QlVV2eDybLN4Bq4lDxtRTzdg9O5F-UG9Oj_YGkbtxKhMnbiV5ZrCMntiPzjlpni21OintZDHH5E"/>
+<div class="absolute top-4 left-4">
+<span class="bg-primary text-white text-[10px] px-3 py-1 text-label-caps uppercase">Best Seller</span>
+</div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="editorial-font text-[28px] leading-tight text-primary">Quantum X-1 Pro Processor</h3>
+<p class="text-label-caps uppercase text-outline mt-1">Celeritas Corp</p>
+</div>
+<span class="editorial-font text-[28px] text-primary">$124.50</span>
+</div>
+<button class="mt-4 text-label-caps uppercase border border-primary py-3 hover:bg-primary hover:text-white transition-all">Details</button>
+</div>
+<!-- Product Card 2 -->
+<div class="group flex flex-col">
+<div class="relative aspect-[4/5] overflow-hidden bg-surface-container mb-6">
+<img alt="Server" class="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1G36MOirrKd8Q0mNh8edE25sZqsHMonUxTN8Y9S7OGVMMae9Ge387QLaxgUPM15IEgZazTT-jXvhh_3lBRJxrwKgvyirNU8LKoT3yf5tEraXLhqus-tsm11FuRCoSMZg08gdYhRLaSzhgbJ0Y4oINNV6xU5fRDo_aDR9GfAVcK4QFZVpHNiAINEmdSOSYsVA0X303q-nzFfA9VM1kSvdkUl_13Uq7mqQw3ctcum1uL6JSZezv81M1vEgy7Ks5lJePuard4iPh5qs"/>
+<div class="absolute top-4 left-4">
+<span class="bg-primary text-white text-[10px] px-3 py-1 text-label-caps uppercase">Enterprise</span>
+</div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="editorial-font text-[28px] leading-tight text-primary">EdgeStream 5G Node</h3>
+<p class="text-label-caps uppercase text-outline mt-1">LogiTech Systems</p>
+</div>
+<span class="editorial-font text-[28px] text-primary">$890.00</span>
+</div>
+<button class="mt-4 text-label-caps uppercase border border-primary py-3 hover:bg-primary hover:text-white transition-all">Details</button>
+</div>
+<!-- Product Card 3 -->
+<div class="group flex flex-col">
+<div class="relative aspect-[4/5] overflow-hidden bg-surface-container mb-6">
+<img alt="Data Center" class="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfo3KL5qFZbA24U4y98rrSMGSecq-apwWnEOWBtwdmr2tuyQYGvdANwsL1xyLU0xHne5VkHC2SLFchBQA7RgPPGPE006SfyiXIq8nRD2j2MUVWHRX7L3w7iYKHgV72ECkDEqVdiuYkQMwZt0Su7EGoujEP6pcyzwFiimraFvlF3DQ8X6z6SujgUdCHWsYkckfbLvK0IqPRuSzbO3S58p7uu7SarI9t_0_rZY0b9Z81yrXvdDsl_sF2ANFagO5NiN20oa3RGx6PAQ0"/>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="editorial-font text-[28px] leading-tight text-primary">Titan Storage Array V4</h3>
+<p class="text-label-caps uppercase text-outline mt-1">DataFortress Ltd</p>
+</div>
+<span class="editorial-font text-[28px] text-primary">$2,100</span>
+</div>
+<button class="mt-4 text-label-caps uppercase border border-primary py-3 hover:bg-primary hover:text-white transition-all">Details</button>
+</div>
+<!-- Product Card 4 -->
+<div class="group flex flex-col">
+<div class="relative aspect-[4/5] overflow-hidden bg-surface-container mb-6">
+<img alt="Sensors" class="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7dUSOY8Y7vZ5dgvt4xSdE9xoCqr1xC5TroWT2Q-sJyptlh8u6tc8mjHPwPDB414dS06tOIoa3_scmYuD9vvXdKhLNVeCHOjxJMkNawgZIV3lND1OwGyfugTkUZ_5uh5TGAe6DS4IPlfZHxh9DpchBbxTyVXC33iA7dZtQ0G2W_Oo5xxNxeQ8_Dorol9okb-jBQNGFFA9E8SbRoPlmEu0XwBJfkTzs1jkDccxz09yZCccHJE5Wq7HO9PBeYOSwrTWgAA1rk-cebRU"/>
+<div class="absolute top-4 left-4">
+<span class="bg-error text-white text-[10px] px-3 py-1 text-label-caps uppercase">Limited</span>
+</div>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="editorial-font text-[28px] leading-tight text-primary">OmniTrack RF Sensors</h3>
+<p class="text-label-caps uppercase text-outline mt-1">MicroSensor Solutions</p>
+</div>
+<span class="editorial-font text-[28px] text-primary">$15.75</span>
+</div>
+<button class="mt-4 text-label-caps uppercase border border-primary py-3 hover:bg-primary hover:text-white transition-all">Details</button>
+</div>
+</div>
+<!-- Pagination -->
+<div class="mt-24 pt-12 border-t border-outline-variant/20 flex flex-col md:flex-row items-center justify-between gap-6">
+<p class="text-label-caps uppercase text-outline">Viewing 01 — 12 of 1,240</p>
+<div class="flex gap-4">
+<button class="px-8 py-3 border border-outline-variant text-label-caps uppercase hover:border-primary transition-all">Back</button>
+<button class="px-8 py-3 bg-primary text-white text-label-caps uppercase hover:bg-on-surface-variant transition-all">Next Page</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-ink-black text-white pt-24 pb-12">
+<div class="max-w-container-max mx-auto px-margin-desktop">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
+<div class="md:col-span-1">
+<span class="editorial-font text-headline-xl block mb-6">TataMart</span>
+<p class="text-on-primary-container text-body-md">Redefining B2B commerce with surgical precision and global reach.</p>
+</div>
+<div>
+<h4 class="text-label-caps uppercase mb-6 opacity-50">Explore</h4>
+<ul class="space-y-4">
+<li><a class="text-body-md hover:opacity-50 transition-opacity" href="#">Marketplace</a></li>
+<li><a class="text-body-md hover:opacity-50 transition-opacity" href="#">Suppliers</a></li>
+<li><a class="text-body-md hover:opacity-50 transition-opacity" href="#">Logistics</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-label-caps uppercase mb-6 opacity-50">Support</h4>
+<ul class="space-y-4">
+<li><a class="text-body-md hover:opacity-50 transition-opacity" href="#">SLA Center</a></li>
+<li><a class="text-body-md hover:opacity-50 transition-opacity" href="#">Privacy</a></li>
+<li><a class="text-body-md hover:opacity-50 transition-opacity" href="#">Enterprise</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-label-caps uppercase mb-6 opacity-50">Subscribe</h4>
+<div class="flex border-b border-outline-variant/30 pb-2">
+<input class="bg-transparent border-none text-white focus:ring-0 w-full placeholder:text-outline-variant" placeholder="Corporate Email" type="email"/>
+<button class="material-symbols-outlined text-white">east</button>
+</div>
+</div>
+</div>
+<div class="flex justify-between items-center pt-8 border-t border-white/5 opacity-40">
+<p class="text-label-mono">© 2024 TataMart Enterprise</p>
+<div class="flex gap-6">
+<span class="material-symbols-outlined">captive_portal</span>
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+</div>
+</div>
+</footer>
+<script>
+    // Minimal interactivity for the search bar expansion
+    const searchInput = document.querySelector('input[type="text"]');
+    if (searchInput) {
+        searchInput.addEventListener('focus', () => {
+            searchInput.classList.remove('w-64');
+            searchInput.classList.add('xl:w-[400px]');
+        });
+        searchInput.addEventListener('blur', () => {
+            if (searchInput.value === '') {
+                searchInput.classList.remove('xl:w-[400px]');
+                searchInput.classList.add('w-64');
+            }
+        });
+    }
+</script>
+</body></html>

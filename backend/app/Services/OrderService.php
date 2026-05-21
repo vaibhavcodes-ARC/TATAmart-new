@@ -54,7 +54,7 @@ class OrderService
                     'order_id' => $order->id,
                     'product_id' => $item->product_id,
                     'seller_id' => $item->product->seller_id ?? $userId, // Default safety fallback
-                    'product_name_snapshot' => $item->product->title,
+                    'product_name_snapshot' => $item->product->name,
                     'quantity' => $item->quantity,
                     'price_at_purchase' => $item->product->price_min ?: 0
                 ]);

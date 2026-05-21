@@ -22,6 +22,25 @@ interface AntigravityProps {
   fieldStrength?: number;
 }
 
+interface Particle {
+  t: number;
+  factor: number;
+  speed: number;
+  xFactor: number;
+  yFactor: number;
+  zFactor: number;
+  mx: number;
+  my: number;
+  mz: number;
+  cx: number;
+  cy: number;
+  cz: number;
+  vx: number;
+  vy: number;
+  vz: number;
+  randomRadiusOffset: number;
+}
+
 const AntigravityInner: React.FC<AntigravityProps> = ({
   count = 300,
   magnetRadius = 10,
@@ -47,8 +66,12 @@ const AntigravityInner: React.FC<AntigravityProps> = ({
   const lastMouseMoveTime = useRef(0);
   const virtualMouse = useRef({ x: 0, y: 0 });
 
-  const particles = useMemo(() => {
-    const temp = [];
+  // Store particles in a ref and initialise once in an effect to avoid impure calls during render
+  const particlesRef = useRef<Particle[] | null>(null);
+
+  React.useEffect(() => {
+    if (particlesRef.current) return;
+    const temp: Particle[] = [];
     const width = viewport.width || 100;
     const height = viewport.height || 100;
 
@@ -85,7 +108,8 @@ const AntigravityInner: React.FC<AntigravityProps> = ({
         randomRadiusOffset
       });
     }
-    return temp;
+
+    particlesRef.current = temp;
   }, [count, viewport.width, viewport.height]);
 
   useFrame(state => {
@@ -119,12 +143,16 @@ const AntigravityInner: React.FC<AntigravityProps> = ({
 
     const globalRotation = state.clock.getElapsedTime() * rotationSpeed;
 
+    const particles = particlesRef.current;
+    if (!particles) return;
+
     particles.forEach((particle, i) => {
-      let { t, speed, mx, my, mz, cz, randomRadiusOffset } = particle;
+      let t = particle.t;
+      const { speed, mx, my, mz, randomRadiusOffset } = particle;
 
       t = particle.t += speed / 2;
 
-      const projectionFactor = 1 - cz / 50;
+      const projectionFactor = 1 - particle.cz / 50;
       const projectedTargetX = targetX * projectionFactor;
       const projectedTargetY = targetY * projectionFactor;
 
@@ -132,7 +160,7 @@ const AntigravityInner: React.FC<AntigravityProps> = ({
       const dy = my - projectedTargetY;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      let targetPos = { x: mx, y: my, z: mz * depthFactor };
+      const targetPos = { x: mx, y: my, z: mz * depthFactor };
 
       if (dist < magnetRadius) {
         const angle = Math.atan2(dy, dx) + globalRotation;

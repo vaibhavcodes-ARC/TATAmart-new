@@ -180,6 +180,31 @@ class ProductSeeder extends Seeder
                 'moq' => 1,
                 'desc' => 'Ultra-low latency spine aggregation switch with wire-rate Layer 3 routing throughput.',
                 'img' => 'https://images.unsplash.com/photo-1597733336794-12d05021d510?auto=format&fit=crop&q=80&w=600'
+            ],
+            // OFFICE & INDUSTRIAL FURNITURE
+            [
+                'cat_slug' => 'ergonomic-chairs',
+                'name' => 'Orthopedic High-Back Adjustable Ergonomic Office Chair',
+                'price' => 14500,
+                'moq' => 10,
+                'desc' => 'Sleek orthopedic back support office task chair with 4D armrests, breathable mesh, and high-performance base for B2B layouts.',
+                'img' => 'https://images.unsplash.com/photo-1580481072645-022f9a6dbf27?auto=format&fit=crop&q=80&w=600'
+            ],
+            [
+                'cat_slug' => 'modular-workstations',
+                'name' => 'Heavy-Duty Quad-Desk Modular Workstation Cluster',
+                'price' => 85000,
+                'moq' => 2,
+                'desc' => 'Premium 4-desk collaborative office desk layout featuring privacy partitions, built-in dual power conduits, and steel framing.',
+                'img' => 'https://images.unsplash.com/photo-1543269608-80a3161a8147?auto=format&fit=crop&q=80&w=600'
+            ],
+            [
+                'cat_slug' => 'steel-storage-cabinets',
+                'name' => 'Double-Door Reinforced Industrial Steel Storage Safe',
+                'price' => 22000,
+                'moq' => 5,
+                'desc' => 'Heavy-gauge cold-rolled steel storage cabinet with secure multi-point latch locking and adjustable shelves for warehouse tools.',
+                'img' => 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&q=80&w=600'
             ]
         ];
 
