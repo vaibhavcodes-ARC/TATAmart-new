@@ -26,8 +26,14 @@ WORKDIR /var/www/html
 # Copy files
 COPY . .
 
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader \
+    && php artisan config:clear \
+    && php artisan route:clear \
+    && php artisan view:clear \
+    && chmod -R 775 storage bootstrap/cache
+
 # Expose port 8000
 EXPOSE 8000
 
 # Start command
-CMD php -S 0.0.0.0:8000 -t public
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

@@ -3,6 +3,10 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  --font-space-grotesk: "Aptos", "Segoe UI", Arial, sans-serif;
+  --font-eb-garamond: Georgia, "Times New Roman", serif;
+  --font-geist-mono: "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+
   --background: #f9f9f9;
   --foreground: #1a1c1c;
 
@@ -188,5 +192,4 @@ h1, h2, h3, h4, h5, h6, .font-heading, .font-hero {
 .reveal.active .editorial-line, .active .editorial-line {
   width: 100%;
 }
-
 

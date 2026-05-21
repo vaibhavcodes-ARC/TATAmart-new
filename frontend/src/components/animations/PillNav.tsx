@@ -61,11 +61,11 @@ const PillNav = ({
 
   // mounted tracking removed; animations disabled
 
-  const handleEnter = (_i?: number) => {
+  const handleEnter = () => {
     // Animations have been disabled for stability; no-op
   };
 
-  const handleLeave = (_i?: number) => {
+  const handleLeave = () => {
     // Animations have been disabled for stability; no-op
   };
 
@@ -129,8 +129,8 @@ const PillNav = ({
                       }}
                       className={`pill${isActive ? ' is-active' : ''}`}
                       aria-label={item.ariaLabel || item.label}
-                      onMouseEnter={() => handleEnter(_i)}
-                      onMouseLeave={() => handleLeave(_i)}
+                      onMouseEnter={handleEnter}
+                      onMouseLeave={handleLeave}
                     >
                       <span
                         className="hover-circle"
@@ -153,8 +153,8 @@ const PillNav = ({
                       onClick={item.onClick}
                       className={`pill${isActive ? ' is-active' : ''}`}
                       aria-label={item.ariaLabel || item.label}
-                      onMouseEnter={() => handleEnter(_i)}
-                      onMouseLeave={() => handleLeave(_i)}
+                      onMouseEnter={handleEnter}
+                      onMouseLeave={handleLeave}
                     >
                       <span
                         className="hover-circle"

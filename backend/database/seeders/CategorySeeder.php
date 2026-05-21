@@ -54,18 +54,22 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $cat) {
-            $parent = Category::create([
-                'name' => $cat['name'],
-                'slug' => Str::slug($cat['name']),
-                'is_featured' => $cat['is_featured']
-            ]);
+            $parent = Category::updateOrCreate(
+                ['slug' => Str::slug($cat['name'])],
+                [
+                    'name' => $cat['name'],
+                    'is_featured' => $cat['is_featured']
+                ]
+            );
 
             foreach ($cat['children'] as $childName) {
-                Category::create([
-                    'name' => $childName,
-                    'slug' => Str::slug($childName),
-                    'parent_id' => $parent->id
-                ]);
+                Category::updateOrCreate(
+                    ['slug' => Str::slug($childName)],
+                    [
+                        'name' => $childName,
+                        'parent_id' => $parent->id
+                    ]
+                );
             }
         }
     }

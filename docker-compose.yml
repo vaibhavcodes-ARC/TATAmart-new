@@ -5,12 +5,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000/api}
+    depends_on:
+      - backend
     networks:
       - tatamart_network
 
@@ -20,22 +18,24 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/var/www/html
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
-      - APP_URL=http://localhost:8000
-      - FRONTEND_URL=http://localhost:3000
-      - JWT_SECRET=local-dev-jwt-secret-change-before-production
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=${APP_DEBUG:-false}
+      - APP_URL=${APP_URL:-http://localhost:8000}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required}
+      - APP_KEY=${APP_KEY:?APP_KEY is required}
       - PHP_CLI_SERVER_WORKERS=4
       - BCRYPT_ROUNDS=8
       - DB_CONNECTION=mysql
       - DB_HOST=mariadb
       - DB_PORT=3306
-      - DB_DATABASE=tatamart_db
-      - DB_USERNAME=tatamart_user
-      - DB_PASSWORD=tatamart_pass
+      - DB_DATABASE=${DB_DATABASE:-tatamart_db}
+      - DB_USERNAME=${DB_USERNAME:-tatamart_user}
+      - DB_PASSWORD=${DB_PASSWORD:?DB_PASSWORD is required}
+      - SESSION_DRIVER=file
+      - CACHE_STORE=file
+      - QUEUE_CONNECTION=sync
     depends_on:
       - mariadb
     networks:
@@ -47,10 +47,10 @@ services:
     ports:
       - "3308:3306"
     environment:
-      MARIADB_ROOT_PASSWORD: root_password
-      MARIADB_DATABASE: tatamart_db
-      MARIADB_USER: tatamart_user
-      MARIADB_PASSWORD: tatamart_pass
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?MARIADB_ROOT_PASSWORD is required}
+      MARIADB_DATABASE: ${DB_DATABASE:-tatamart_db}
+      MARIADB_USER: ${DB_USERNAME:-tatamart_user}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
     volumes:
       - db_data:/var/lib/mysql
     networks:
@@ -62,7 +62,7 @@ services:
       - "8085:80"
     environment:
       PMA_HOST: mariadb
-      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?MARIADB_ROOT_PASSWORD is required}
     depends_on:
       - mariadb
     networks:
