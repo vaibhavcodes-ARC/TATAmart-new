@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\CartRepository;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
@@ -32,18 +33,46 @@ class OrderService
             throw new Exception("Cannot process checkout with an empty cart.");
         }
 
-        // compute totals from payload defensively
-        $subtotal = 0;
+        // Load products from DB and validate client payload — do NOT trust client prices
+        $productIds = array_map(fn($it) => intval($it['product_id'] ?? 0), $items);
+        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+
+        $subtotal = 0.0;
+        $preparedItems = [];
+
         foreach ($items as $it) {
-            $qty = isset($it['quantity']) ? intval($it['quantity']) : 1;
-            $price = isset($it['price']) ? floatval($it['price']) : 0.0;
-            $subtotal += $qty * $price;
+            $pid = intval($it['product_id'] ?? 0);
+            $qty = max(1, intval($it['quantity'] ?? 1));
+
+            $product = $products->get($pid);
+            if (!$product) {
+                throw new Exception("Product with id {$pid} was not found or is inactive.");
+            }
+
+            // Enforce minimum order quantities defined on product
+            $minQty = isset($product->min_order_quantity) ? intval($product->min_order_quantity) : 1;
+            if ($qty < $minQty) {
+                throw new Exception("Quantity for product {$product->name} cannot be less than {$minQty}.");
+            }
+
+            // Use canonical seller and price from product record
+            $linePrice = floatval($product->price_min ?? 0.0);
+            $lineTotal = $linePrice * $qty;
+            $subtotal += $lineTotal;
+
+            $preparedItems[] = [
+                'product_id' => $pid,
+                'seller_id' => $product->seller_id ?? $userId,
+                'product_name' => $product->name,
+                'quantity' => $qty,
+                'price' => $linePrice
+            ];
         }
 
-        $taxAmount = round($subtotal * 0.18, 2); // CGST+SGST 9%+9%
-        $grandTotal = $subtotal + $taxAmount + 500.00; // flat freight as in frontend
+        $taxAmount = round($subtotal * 0.18, 2);
+        $grandTotal = round($subtotal + $taxAmount + 500.00, 2);
 
-        return DB::transaction(function () use ($items, $userId, $data, $subtotal, $taxAmount, $grandTotal) {
+        return DB::transaction(function () use ($preparedItems, $userId, $data, $subtotal, $taxAmount, $grandTotal) {
             $order = Order::create([
                 'order_number' => 'ORD-' . strtoupper(uniqid()),
                 'buyer_id' => $userId,
@@ -57,14 +86,14 @@ class OrderService
                 'payment_status' => 'pending'
             ]);
 
-            foreach ($items as $item) {
+            foreach ($preparedItems as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'product_id' => $item['product_id'] ?? null,
-                    'seller_id' => $item['seller_id'] ?? $userId,
-                    'product_name_snapshot' => $item['product_name'] ?? 'Product',
-                    'quantity' => intval($item['quantity'] ?? 1),
-                    'price_at_purchase' => floatval($item['price'] ?? 0)
+                    'product_id' => $item['product_id'],
+                    'seller_id' => $item['seller_id'],
+                    'product_name_snapshot' => $item['product_name'],
+                    'quantity' => $item['quantity'],
+                    'price_at_purchase' => $item['price']
                 ]);
             }
 

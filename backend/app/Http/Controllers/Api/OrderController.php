@@ -44,7 +44,10 @@ class OrderController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'shippingAdd' => 'required|string|min:5'
+            'shippingAdd' => 'required|string|min:5',
+            'items' => 'nullable|array',
+            'items.*.product_id' => 'required_with:items|integer|exists:products,id',
+            'items.*.quantity' => 'required_with:items|integer|min:1'
         ]);
 
         try {
