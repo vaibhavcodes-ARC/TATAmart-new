@@ -68,3 +68,69 @@ docker-compose exec backend php artisan optimize:clear
 ```
 
 Enjoy building the future of B2B commerce!
+
+---
+
+## 📦 Non-Docker Deployment (Detailed)
+If you prefer a simple host/server deployment without Docker, follow these steps.
+
+### 1) Database
+Create DB and user (example):
+```sql
+CREATE DATABASE tatamart_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'tatamart_user'@'localhost' IDENTIFIED BY 'tatamart_pass';
+GRANT ALL PRIVILEGES ON tatamart_db.* TO 'tatamart_user'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+### 2) Backend (Laravel)
+Run these from the `backend/` folder:
+```bash
+cd backend
+composer install --no-interaction --prefer-dist
+cp .env.example .env
+# edit .env to set DB_* and APP_URL
+php artisan key:generate
+php artisan storage:link
+php artisan migrate
+# seed only product data to avoid duplicate-user/category errors
+php artisan db:seed --class=ProductSeeder
+# development server (not for production)
+php artisan serve --host=0.0.0.0 --port=8000
+```
+
+### 3) Frontend (Next.js)
+From the `frontend/` folder:
+```bash
+cd frontend
+npm ci
+# set API url before build
+# Linux/macOS
+export NEXT_PUBLIC_API_URL=http://localhost:8000/api
+npm run build
+npm run start
+
+# Windows PowerShell
+$env:NEXT_PUBLIC_API_URL='http://localhost:8000/api'; npm run build; npm run start
+```
+
+If port 3000 is occupied you can run `next start` on a different port by setting `PORT` env var (example for Windows PowerShell):
+```powershell
+cd frontend
+$env:PORT='3001'; npm run start
+# or use cross-env: npx cross-env PORT=3001 npm run start
+```
+
+### 4) Quick checklist
+- [ ] DB created and credentials set
+- [ ] Backend `.env` configured and `composer install` run
+- [ ] `php artisan migrate` ran successfully
+- [ ] `ProductSeeder` applied (non-destructive)
+- [ ] Frontend `npm run build` and `npm run start` verified
+
+### 5) Production notes (short)
+- Use `composer install --no-dev --optimize-autoloader` and serve PHP via `php-fpm` + nginx.
+- Serve Next behind nginx or use a platform (Vercel/Netlify) and enable TLS.
+- Replace development secrets and set `APP_ENV=production`, `APP_DEBUG=false`.
+
+For a step-by-step deployment guide see `DEPLOYMENT.md` in the repository.
