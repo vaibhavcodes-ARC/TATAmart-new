@@ -48,10 +48,21 @@ class OrderController extends Controller
         ]);
 
         try {
-            $order = $this->orderService->createFromCart(
-                $request->user()->id,
-                $request->only('shippingAdd')
-            );
+            // If the client provides an explicit `items` payload, create the
+            // order from that payload to avoid race conditions where the
+            // server-side cart may have been cleared before the request.
+            if ($request->has('items') && is_array($request->input('items'))) {
+                $order = $this->orderService->createFromPayload(
+                    $request->user()->id,
+                    $request->only('shippingAdd'),
+                    $request->input('items')
+                );
+            } else {
+                $order = $this->orderService->createFromCart(
+                    $request->user()->id,
+                    $request->only('shippingAdd')
+                );
+            }
 
             return $this->successResponse($order, 'Order placed successfully', 201);
         } catch (Exception $e) {

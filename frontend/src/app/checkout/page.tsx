@@ -103,7 +103,11 @@ export default function CheckoutPage() {
         }
       })));
       if (items.length === 0) {
-        if (!paymentSuccess) {
+        // If cart is empty because we've just started checkout, don't redirect
+        // while the checkout/payment flow is still in progress. This prevents
+        // losing the user mid-payment when the backend clears the cart on order creation.
+        const checkoutInProgress = checkingOut || showSimulatedModal || paymentVerificationState !== 'idle';
+        if (!paymentSuccess && !checkoutInProgress) {
           router.push('/cart');
         }
       }
@@ -142,8 +146,16 @@ export default function CheckoutPage() {
 
     try {
       // 1. Create order record on the backend
+      // Send a cart snapshot to the server to avoid server-side cart race conditions
       const orderResponse = await api.post('/orders', {
-        shippingAdd: shippingAddress
+        shippingAdd: shippingAddress,
+        items: cartItems.map((it) => ({
+          product_id: it.product.id,
+          quantity: it.quantity,
+          product_name: it.product.name,
+          price: it.product.price,
+          seller_id: undefined
+        }))
       });
       const orderData = orderResponse.data.data;
 
@@ -152,6 +164,9 @@ export default function CheckoutPage() {
         order_id: orderData.id
       });
       setSimulatedOrderDetails(paymentResponse.data.data);
+      // Show the simulated Razorpay modal automatically for sandbox flows
+      // so the user can complete the simulated payment immediately.
+      setShowSimulatedModal(true);
     } catch (error) {
       setCheckoutError(getApiErrorMessage(error, 'Initiating payment failed. Please try again.'));
       setPaymentVerificationState('failed');
