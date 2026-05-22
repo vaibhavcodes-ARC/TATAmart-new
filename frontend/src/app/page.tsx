@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Code2, Cpu, Database, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
@@ -98,6 +98,33 @@ export default function Home() {
       moq: '5 Tons',
       img: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&q=80&w=400'
     }
+  ];
+
+  const developers = [
+    {
+      name: 'Vaibhav',
+      role: 'Full-Stack Lead',
+      focus: 'Architecture, Laravel APIs, MariaDB schema, deployment flow',
+      icon: Cpu,
+    },
+    {
+      name: 'Umang',
+      role: 'Frontend Engineer',
+      focus: 'Premium UI systems, dashboards, checkout visuals',
+      icon: Code2,
+    },
+    {
+      name: 'Dilshad',
+      role: 'Backend Developer',
+      focus: 'Eloquent controllers, SKU logic, API test coverage',
+      icon: Database,
+    },
+    {
+      name: 'Bhabya',
+      role: 'Quality Analyst',
+      focus: 'Responsive audits, production build validation, UI testing',
+      icon: ShieldCheck,
+    },
   ];
 
   return (
@@ -359,6 +386,63 @@ export default function Home() {
                 </div>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* From the Developers */}
+      <section className="py-32 bg-[#F9F9F9] dark:bg-[#111111] border-t border-[#E5E5E5] dark:border-zinc-800">
+        <div className="max-w-7xl mx-auto px-6 md:px-16">
+          <div className="flex flex-col lg:flex-row justify-between gap-14 mb-16">
+            <div className="max-w-2xl">
+              <span className="font-monoenterprise text-xs uppercase tracking-widest text-[#346941]">Engineering Core</span>
+              <h2 className="font-heading text-4xl sm:text-5xl md:text-6xl text-ink-black dark:text-white mt-4">
+                From the Developers
+              </h2>
+              <p className="font-sans text-base text-zinc-550 dark:text-zinc-450 mt-5 leading-relaxed">
+                The team behind TATAmart&apos;s marketplace experience, secure Laravel backend, deployment pipeline, and production-ready B2B workflows.
+              </p>
+            </div>
+            <div className="flex items-end">
+              <Link
+                href="/from-the-developers"
+                className="inline-flex items-center justify-center gap-2 border border-ink-black dark:border-white px-8 py-3.5 font-monoenterprise text-[10px] uppercase tracking-widest hover:bg-ink-black hover:text-white dark:hover:bg-white dark:hover:text-ink-black transition-all rounded-sm"
+              >
+                Full Team
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {developers.map((developer) => {
+              const Icon = developer.icon;
+              return (
+                <Link
+                  key={developer.name}
+                  href="/from-the-developers"
+                  className="group border border-[#E5E5E5] dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 rounded-sm transition-all duration-300 hover:border-ink-black dark:hover:border-white"
+                >
+                  <div className="flex items-center justify-between mb-12">
+                    <div className="h-11 w-11 border border-[#E5E5E5] dark:border-zinc-800 flex items-center justify-center text-[#346941] group-hover:bg-ink-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-ink-black transition-colors">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <span className="font-monoenterprise text-[9px] uppercase tracking-widest text-zinc-400">
+                      Core
+                    </span>
+                  </div>
+                  <h3 className="font-heading text-2xl text-ink-black dark:text-white">
+                    {developer.name}
+                  </h3>
+                  <p className="font-monoenterprise text-[10px] uppercase tracking-widest text-[#346941] mt-2">
+                    {developer.role}
+                  </p>
+                  <p className="font-sans text-sm leading-relaxed text-zinc-550 dark:text-zinc-450 mt-5">
+                    {developer.focus}
+                  </p>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
