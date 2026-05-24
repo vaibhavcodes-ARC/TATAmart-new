@@ -1,6 +1,6 @@
-# TATAmart Enterprise B2B Marketplace
+# G-Mart Enterprise B2B Marketplace
 
-Welcome to the official Enterprise iteration of TATAmart. This codebase contains a complete Next.js TypeScript Frontend and a scalable Laravel 11 RESTful Backend supporting advanced marketplace transactional flow.
+Welcome to the official Enterprise iteration of G-Mart. This codebase contains a complete Next.js TypeScript Frontend and a scalable Laravel 11 RESTful Backend supporting advanced marketplace transactional flow.
 
 ## 🚀 Quick Start Guide (Recommended: Docker)
 
